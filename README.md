@@ -44,6 +44,8 @@ open DockNearby.xcodeproj
    - `DEVELOPMENT_TEAM` — your Team ID (Xcode → Settings → Accounts, or developer.apple.com → Membership)
    - `BASE_BUNDLE_ID` — e.g. `com.yourname.docknearby` (widget becomes `<that>.DockWidget`)
    - `APP_GROUP_ID` — e.g. `group.com.yourname.docknearby`
+   Set these in `project.yml`, not in Xcode's Signing tab — `xcodegen generate` rebuilds
+   the project and wipes anything set there.
 2. `xcodegen generate`, open the project, pick your phone, Run.
    Automatic signing registers the App IDs and App Group for you.
 3. Allow location, star a few stations, then add the widget from the home screen.

@@ -10,7 +10,7 @@ options:
 settings:
   base:
     # ---- Set these three before running on a device -------------------
-    DEVELOPMENT_TEAM: ""                          # your 10-char Team ID
+    DEVELOPMENT_TEAM: 84LP9M3UUC                  # Nicholas Shampoe (Personal Team)
     BASE_BUNDLE_ID: com.nick.docknearby           # app ID; widget appends .DockWidget
     APP_GROUP_ID: group.com.nick.docknearby       # must match in the Developer portal
     # --------------------------------------------------------------------
