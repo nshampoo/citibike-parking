@@ -9,9 +9,12 @@ struct DockEntry: TimelineEntry {
     let state: State
 
     static let sample = DockEntry(date: .now, stations: [
-        NearbyStation(id: "1", name: "W 70 St & Amsterdam Ave", meters: 100, docks: 7, classic: 4, ebikes: 3, renting: true, capacity: 20),
-        NearbyStation(id: "2", name: "Amsterdam Ave & W 73 St", meters: 200, docks: 2, classic: 8, ebikes: 5, renting: true),
-        NearbyStation(id: "3", name: "Columbus Ave & W 72 St", meters: 280, docks: 0, classic: 10, ebikes: 9, renting: true),
+        NearbyStation(id: "1", name: "W 70 St & Amsterdam Ave", meters: 100, docks: 7, classic: 4, ebikes: 3, renting: true, capacity: 20,
+                      latitude: 40.7780, longitude: -73.9819),
+        NearbyStation(id: "2", name: "Amsterdam Ave & W 73 St", meters: 200, docks: 2, classic: 8, ebikes: 5, renting: true,
+                      latitude: 40.7797, longitude: -73.9808),
+        NearbyStation(id: "3", name: "Columbus Ave & W 72 St", meters: 280, docks: 0, classic: 10, ebikes: 9, renting: true,
+                      latitude: 40.7780, longitude: -73.9777),
     ], state: .loaded)
 }
 

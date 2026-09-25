@@ -44,6 +44,11 @@ public actor GBFSClient {
         return try await Self.merge(info: info, statuses: statuses, here: here, count: count, only: only)
     }
 
+    /// Every installed station with live counts, closest first — for the app's map and list.
+    public func stations(near here: CLLocation) async throws -> [NearbyStation] {
+        try await nearest(to: here, count: .max)
+    }
+
     // MARK: Pure logic (unit-tested)
 
     static func merge(info: [StationInfo], statuses: [StationStatus], here: CLLocation,
@@ -60,7 +65,8 @@ public actor GBFSClient {
                     docks: st.isReturning == 1 ? st.numDocksAvailable : 0,
                     classic: max(0, st.numBikesAvailable - e), ebikes: e,
                     renting: st.isRenting == 1,
-                    capacity: (s.capacity ?? 0) > 0 ? s.capacity : nil)
+                    capacity: (s.capacity ?? 0) > 0 ? s.capacity : nil,
+                    latitude: s.lat, longitude: s.lon)
             }
             .sorted { $0.meters < $1.meters }
             .prefix(count)

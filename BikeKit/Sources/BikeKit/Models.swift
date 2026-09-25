@@ -1,4 +1,5 @@
 import Foundation
+import CoreLocation
 
 // MARK: - Raw GBFS 1.1 shapes (decoded with .convertFromSnakeCase)
 
@@ -39,9 +40,11 @@ public struct NearbyStation: Identifiable, Hashable, Sendable {
     public let renting: Bool
     /// Total docks, when the feed reports a real value (some stations report 0).
     public let capacity: Int?
+    public let latitude: Double
+    public let longitude: Double
 
     public init(id: String, name: String, meters: Double, docks: Int, classic: Int, ebikes: Int,
-                renting: Bool, capacity: Int? = nil) {
+                renting: Bool, capacity: Int? = nil, latitude: Double, longitude: Double) {
         self.id = id
         self.name = name
         self.meters = meters
@@ -50,6 +53,14 @@ public struct NearbyStation: Identifiable, Hashable, Sendable {
         self.ebikes = ebikes
         self.renting = renting
         self.capacity = capacity
+        self.latitude = latitude
+        self.longitude = longitude
+    }
+
+    public var coordinate: CLLocationCoordinate2D { .init(latitude: latitude, longitude: longitude) }
+
+    public func distance(from here: CLLocation) -> CLLocationDistance {
+        here.distance(from: CLLocation(latitude: latitude, longitude: longitude))
     }
 }
 
