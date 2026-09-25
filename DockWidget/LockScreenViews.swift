@@ -45,16 +45,20 @@ struct RectangularView: View {
         }
     }
 
+    /// "now ↻" pinned to the right. The Spacer sits outside the Button: widget buttons
+    /// shrink to their content, so a frame inside the label wouldn't push it over.
     private var refreshRow: some View {
-        Button(intent: RefreshIntent()) {
-            HStack(spacing: 4) {
-                Image(systemName: "arrow.clockwise").font(.system(size: 20))
-                DataAge(date: entry.date).font(.caption2)
+        HStack(spacing: 0) {
+            Spacer(minLength: 0)
+            Button(intent: RefreshIntent()) {
+                HStack(spacing: 4) {
+                    DataAge(date: entry.date).font(.caption2)
+                    Image(systemName: "arrow.clockwise").font(.system(size: 20))
+                }
+                .foregroundStyle(.secondary)
             }
-            .foregroundStyle(.secondary)
-            .frame(maxWidth: .infinity, alignment: .trailing)
+            .buttonStyle(.plain)
         }
-        .buttonStyle(.plain)
     }
 }
 
