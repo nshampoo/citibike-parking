@@ -45,6 +45,7 @@ targets:
           [UIInterfaceOrientationPortrait, UIInterfaceOrientationLandscapeLeft, UIInterfaceOrientationLandscapeRight]
         NSLocationWhenInUseUsageDescription: Find the Citi Bike stations near you
         AppGroupID: $(APP_GROUP_ID)
+        ITSAppUsesNonExemptEncryption: false   # only HTTPS; skips the export question on each upload
     entitlements:
       path: DockNearby/DockNearby.entitlements
       properties:
