@@ -97,3 +97,29 @@ func liveFeedReturnsNearbyStations() async throws {
     let all = try await client.stations(near: here)
     #expect(all.count > 1_000)
 }
+
+// MARK: - Short names
+
+@Test(arguments: [
+    ("W 72 St & Amsterdam Ave", "72nd"),
+    ("Amsterdam Ave & W 73 St", "73rd"),      // street wins even when listed second
+    ("4 Ave & 72 St", "72nd"),
+    ("W 4 St & 7 Ave S", "4th"),
+    ("E 111 St & 1 Ave", "111th"),
+    ("W 21 St & 6 Ave", "21st"),
+    ("Central Park S & 6 Ave", "6th Av"),     // no numbered street → numbered avenue
+    ("67 Ave & Fresh Pond Rd", "67th Av"),
+    ("Vesey St & Church St", "Vesey"),        // no numbers → first road, suffix dropped
+    ("E Mosholu Pkwy & Van Cortlandt Ave E", "Mosholu"),
+    ("Broadway & Roebling St", "Broadway"),
+    ("Pier 40 - Hudson River Park", "Pier 40"),
+    ("Lafayette Park", "Lafayette Park"),
+])
+func shortensStationNames(name: String, expected: String) {
+    #expect(StationName.short(name) == expected)
+}
+
+@Test func ordinals() {
+    #expect([1, 2, 3, 4, 11, 12, 13, 22, 101, 112].map(StationName.ordinal)
+            == ["1st", "2nd", "3rd", "4th", "11th", "12th", "13th", "22nd", "101st", "112th"])
+}
