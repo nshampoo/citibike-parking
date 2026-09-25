@@ -18,6 +18,9 @@ struct DockConfig: WidgetConfigurationIntent {
 
     @Parameter(title: "Show", default: .closest)
     var mode: StationMode
+
+    @Parameter(title: "Only stations with room", default: false)
+    var needsRoom: Bool
 }
 
 /// Tapping a Button(intent:) runs perform(), then WidgetKit reloads the timeline.

@@ -57,6 +57,10 @@ public struct NearbyStation: Identifiable, Hashable, Sendable {
         self.longitude = longitude
     }
 
+    /// "Has room" means at least this many open docks — one might be gone by the time you arrive.
+    public static let roomMinimum = 2
+    public var hasRoom: Bool { docks >= Self.roomMinimum }
+
     public var coordinate: CLLocationCoordinate2D { .init(latitude: latitude, longitude: longitude) }
 
     public func distance(from here: CLLocation) -> CLLocationDistance {

@@ -17,6 +17,8 @@ struct HomeView: View {
         fallback: .region(MKCoordinateRegion(center: SharedStore.fallbackLocation.coordinate,
                                              latitudinalMeters: 1_500, longitudinalMeters: 1_500)))
     @State private var visibleRegion: MKCoordinateRegion?
+    /// Per-device preference, so plain UserDefaults (not the App Group) is enough.
+    @AppStorage("onlyWithRoom") private var onlyWithRoom = false
 
     /// SwiftUI maps slow down with thousands of annotations, so draw at most this many.
     private static let maxPins = 150
@@ -31,6 +33,9 @@ struct HomeView: View {
             .navigationTitle("DockNearby")
             .navigationBarTitleDisplayMode(.inline)
             .searchable(text: $query, prompt: "Search stations")
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) { roomFilterButton }
+            }
             .sheet(item: selection) { station in
                 StationDetailView(station: station, here: location.location)
                     .presentationDetents([.height(250)])
@@ -51,7 +56,8 @@ struct HomeView: View {
             UserAnnotation()
             ForEach(pins) { s in
                 Annotation(s.name, coordinate: s.coordinate) {
-                    StationPin(docks: s.docks, isFavorite: favorites.contains(s.id), isSelected: s.id == selectedID)
+                    StationPin(docks: s.docks, isFavorite: favorites.contains(s.id), isSelected: s.id == selectedID,
+                               isDimmed: onlyWithRoom && !s.hasRoom)
                         .onTapGesture { selectedID = s.id }
                 }
                 .annotationTitles(.hidden)
@@ -85,7 +91,8 @@ struct HomeView: View {
             ?? stations.sorted { $0.name.localizedStandardCompare($1.name) == .orderedAscending }
         let matches = query.isEmpty ? sorted : sorted.filter { $0.name.localizedStandardContains(query) }
         let favs = matches.filter { favorites.contains($0.id) }
-        let others = matches.filter { !favorites.contains($0.id) }
+        // Favorites always show; the room filter only trims the rest.
+        let others = matches.filter { !favorites.contains($0.id) && (!onlyWithRoom || $0.hasRoom) }
 
         return List {
             if !location.isAuthorized { permissionBanner }
@@ -150,6 +157,13 @@ struct HomeView: View {
 
     // MARK: Views
 
+    private var roomFilterButton: some View {
+        Button { onlyWithRoom.toggle() } label: {
+            Image(systemName: onlyWithRoom ? "line.3.horizontal.decrease.circle.fill" : "line.3.horizontal.decrease.circle")
+        }
+        .accessibilityLabel(onlyWithRoom ? "Show all stations" : "Only stations with room")
+    }
+
     private var permissionBanner: some View {
         Section {
             Label("Location is off, so the widget uses your last known spot.", systemImage: "location.slash")
@@ -180,6 +194,7 @@ struct StationPin: View {
     let docks: Int
     let isFavorite: Bool
     let isSelected: Bool
+    var isDimmed = false
 
     var body: some View {
         Text("\(docks)")
@@ -197,6 +212,7 @@ struct StationPin: View {
                         .offset(x: 5, y: -5)
                 }
             }
+            .opacity(isDimmed ? 0.35 : 1)
             .scaleEffect(isSelected ? 1.35 : 1)
             .animation(.snappy, value: isSelected)
             .shadow(radius: 2)

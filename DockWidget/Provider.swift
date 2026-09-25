@@ -46,7 +46,8 @@ struct Provider: AppIntentTimelineProvider {
         let here = await LocationFetcher.current()
         do {
             let stations = try await GBFSClient.shared.nearest(
-                to: here, count: count, only: config.mode == .favorites ? favorites : nil)
+                to: here, count: count, only: config.mode == .favorites ? favorites : nil,
+                needsRoom: config.needsRoom)
             return DockEntry(date: .now, stations: stations, state: .loaded)
         } catch {
             return DockEntry(date: .now, stations: [], state: .failed)
