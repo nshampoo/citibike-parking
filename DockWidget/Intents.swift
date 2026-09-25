@@ -41,11 +41,3 @@ struct DockConfig: WidgetConfigurationIntent {
         }
     }
 }
-
-/// Tapping a Button(intent:) runs perform(), then WidgetKit reloads the timeline.
-struct RefreshIntent: AppIntent {
-    static var title: LocalizedStringResource { "Refresh Citi Bike" }
-    static var isDiscoverable: Bool { false }   // widget-only; hide from Shortcuts
-
-    func perform() async throws -> some IntentResult { .result() }
-}

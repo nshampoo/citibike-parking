@@ -1,12 +1,12 @@
 # DockNearby
 
-A SwiftUI app + home screen widget that shows open Citi Bike docks near you,
-with classic/e-bike counts and a tap-to-refresh button.
+A SwiftUI app + Lock Screen widget that shows open Citi Bike docks near you,
+near a destination, or at your favorite stations.
 
-- **Widget** (home screen: medium / large; Lock Screen: rectangular / circular / inline): each widget can show *Closest to me* or *My favorites*
-  (long-press → Edit Widget). Refresh button is an interactive `AppIntent` (iOS 17+).
-  The Lock Screen rectangular widget shows up to three dots — open docks inside, short
-  street name below ("W 72 St & Amsterdam Ave" → "72nd").
+- **Lock Screen widget** (rectangular / circular / inline): each can show *Closest to me*,
+  *My favorites*, or *Near a destination* (long-press → Customize → tap the widget).
+  Rectangular shows up to three dots — open docks inside, short street name below
+  ("W 72 St & Amsterdam Ave" → "72nd").
 - **App**: asks for location on first launch (which also unlocks location for the widget).
   The main screen is a map of stations (pins show open docks) above a nearby list;
   tap a pin or row for live counts, a favorite button, and cycling directions.
@@ -48,7 +48,7 @@ open DockNearby.xcodeproj
    the project and wipes anything set there.
 2. `xcodegen generate`, open the project, pick your phone, Run.
    Automatic signing registers the App IDs and App Group for you.
-3. Allow location, star a few stations, then add the widget from the home screen.
+3. Allow location, star a few stations, then add the widget to your Lock Screen.
 
 ## Commands
 
@@ -69,7 +69,7 @@ cd BikeKit && LIVE_GBFS=1 swift test
 - **iCloud Drive + codesign:** this repo lives in an iCloud-synced folder. Keep build output in
   the default `~/Library/Developer/Xcode/DerivedData` — building *inside* the repo fails with
   "resource fork, Finder information, or similar detritus not allowed".
-- Widgets reload about every 15 minutes at best; button taps get extra budget.
+- Widgets reload about every 15 minutes at best.
 - No location in the widget? Check the app has permission. The widget falls back to the last
   location the app saw, then to 71st & Amsterdam.
 - Widget extensions have a ~30 MB memory limit; BikeKit caches only the station fields it uses.
