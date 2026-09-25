@@ -32,7 +32,8 @@ These have compiled cleanly but have never been used on a real device:
 - [ ] Tap a place chip → map flies there, list shows "Near Work"; tap again to go back
 - [ ] **Open docks** chip dims full pins and hides them from the list
 - [ ] **Park | Ride** switch; in Ride, **E-bikes** / **Classic** chips (tap again for any bike); counts on pins, rows, card
-- [ ] Widget **Count** setting: Open docks / Any bike / E-bikes / Classic — label in the top row matches
+- [ ] Widget **Count** setting: Parking / Any bike / E-bikes / Classic — label in the top row matches
+- [ ] **Home screen widgets** (small / medium / large): header "PARKING · Nearby", ↻ refresh, colored counts; try each mode
 - [ ] Lock Screen widget, rectangular:
   - [ ] "now ↻" is right-aligned with no gap
   - [ ] tapping ↻ refreshes the counts

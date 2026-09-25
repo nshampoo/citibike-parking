@@ -27,8 +27,8 @@ Never ride up to a full station again. Park It shows how many docks are open at 
 LIVE MAP
 Every station is a pin with its open-dock count, colored green, amber, or red. Tap one for bikes, e-bikes, and docks, plus cycling directions in Apple Maps.
 
-LOCK SCREEN WIDGET
-Check docks without unlocking your phone. Show the stations closest to you, your favorites, or the ones near a place you're heading, then tap ↻ to refresh.
+WIDGETS, HOME AND LOCK SCREEN
+Check docks or bikes without opening an app. Show the stations closest to you, your favorites, or the ones near a place you're heading, then tap ↻ to refresh. Small, medium, and large on your Home Screen, plus Lock Screen sizes.
 
 COMMUTE MODE
 Set Home and Work once. In the morning the widget shows docks near Work; after noon, near Home. No fiddling.

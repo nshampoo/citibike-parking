@@ -2,10 +2,11 @@
 
 (Code name **DockNearby** — targets, bundle IDs, and the repo keep that name.)
 
-A SwiftUI app + Lock Screen widget that shows open Citi Bike docks near you,
-near a destination, or at your favorite stations.
+A SwiftUI app + widgets (home screen and Lock Screen) that show open Citi Bike docks —
+or bikes — near you, near a destination, or at your favorite stations.
 
-- **Lock Screen widget** (rectangular / circular / inline): each can show *Closest to me*,
+- **Widgets** — home screen (small / medium / large) and Lock Screen (rectangular / circular /
+  inline), with a ↻ refresh button on the larger ones. Each can show *Closest to me*,
   *My favorites*, *Near a destination*, or *Commute* — near Work 4am–noon, Home otherwise,
   once both are set (long-press → Customize → tap the widget).
   Each widget also picks what to **Count**: open docks, any bike, e-bikes, or classic bikes.
