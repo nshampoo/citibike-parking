@@ -153,8 +153,10 @@ extension HomeView {
     /// Debug-only launch arguments that stage App Store screenshots without tapping:
     ///   -screenshotCard    open the first favorite's (or nearest roomy station's) card
     ///   -screenshotPlaces  save demo Home/Work if missing and show docks near Work
+    ///   -screenshotPeek    start with the sheet at its smallest height
     private func applyScreenshotArguments() {
         let args = ProcessInfo.processInfo.arguments
+        if args.contains("-screenshotPeek") { model.detent = HomeModel.peek }
         if args.contains("-screenshotCard"),
            let s = model.stations.first(where: { favorites.contains($0.id) })
                ?? model.stations.first(where: { $0.docks > 5 }) {

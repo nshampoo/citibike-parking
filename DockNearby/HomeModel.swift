@@ -6,8 +6,8 @@ import BikeKit
 @Observable
 @MainActor
 final class HomeModel {
-    /// Sheet heights: just search + chips, half the screen, full screen.
-    static let peek = PresentationDetent.height(150)
+    /// Sheet heights: just search + the two chip rows, half the screen, full screen.
+    static let peek = PresentationDetent.height(176)
     static let half = PresentationDetent.fraction(0.45)
 
     static let followUser = MapCameraPosition.userLocation(

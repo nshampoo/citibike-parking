@@ -30,7 +30,10 @@ struct StationsSheet: View {
             } else {
                 VStack(spacing: 12) {
                     searchField.padding(.horizontal)
-                    chips
+                    VStack(spacing: 8) {
+                        filterChips
+                        placeChips
+                    }
                     list
                 }
                 .padding(.top, 20)
@@ -67,40 +70,49 @@ struct StationsSheet: View {
         .background(.fill.tertiary, in: .capsule)
     }
 
-    /// Park | Ride, the hide-empty filter (plus e-bike/classic in Ride), Home and Work,
-    /// other saved places, then +. Tap a place to see stations there; long-press to change it.
-    private var chips: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 8) {
-                Picker("Looking for", selection: rideMode) {
-                    Text("Park").tag(false)
-                    Text("Ride").tag(true)
-                }
-                .pickerStyle(.segmented)
-                .fixedSize()
-
-                Chip(title: need.isBike ? "Has bikes" : "Open docks",
-                     systemImage: need.isBike ? "bicycle.circle" : "parkingsign.circle", isOn: hideEmpty) {
-                    hideEmpty.toggle()
-                }
-                if need.isBike {
-                    // Mutually exclusive: tap one to narrow to that kind, tap again for any bike.
-                    Chip(title: "E-bikes", systemImage: "bolt.fill", isOn: need == .eBike) {
-                        need = need == .eBike ? .anyBike : .eBike
-                    }
-                    Chip(title: "Classic", systemImage: "bicycle", isOn: need == .classicBike) {
-                        need = need == .classicBike ? .anyBike : .classicBike
-                    }
-                }
-                fixedPlaceChip(.home, destinations.home)
-                fixedPlaceChip(.work, destinations.work)
-                ForEach(destinations.others) { placeChip($0, icon: "mappin") }
-                Chip(title: destinations.others.isEmpty ? "Add place" : nil, systemImage: "plus", isOn: false) {
-                    adding = .other
-                }
-                .accessibilityLabel("Add place")
+    /// Row 1 — what you're looking for: Park | Ride, the hide-empty filter, and in Ride
+    /// the e-bike / classic narrowing (mutually exclusive; tap again for any bike).
+    private var filterChips: some View {
+        chipRow {
+            Picker("Looking for", selection: rideMode) {
+                Text("Park").tag(false)
+                Text("Ride").tag(true)
             }
-            .padding(.horizontal)
+            .pickerStyle(.segmented)
+            .fixedSize()
+
+            Chip(title: need.isBike ? "Has bikes" : "Open docks",
+                 systemImage: need.isBike ? "bicycle.circle" : "parkingsign.circle", isOn: hideEmpty) {
+                hideEmpty.toggle()
+            }
+            if need.isBike {
+                Chip(title: "E-bikes", systemImage: "bolt.fill", isOn: need == .eBike) {
+                    need = need == .eBike ? .anyBike : .eBike
+                }
+                Chip(title: "Classic", systemImage: "bicycle", isOn: need == .classicBike) {
+                    need = need == .classicBike ? .anyBike : .classicBike
+                }
+            }
+        }
+    }
+
+    /// Row 2 — where: Home, Work, other saved places, then +. Tapping one moves the map
+    /// there; long-press to change or delete it.
+    private var placeChips: some View {
+        chipRow {
+            fixedPlaceChip(.home, destinations.home)
+            fixedPlaceChip(.work, destinations.work)
+            ForEach(destinations.others) { placeChip($0, icon: "mappin") }
+            Chip(title: destinations.others.isEmpty ? "Add place" : nil, systemImage: "plus", isOn: false) {
+                adding = .other
+            }
+            .accessibilityLabel("Add place")
+        }
+    }
+
+    private func chipRow(@ViewBuilder _ content: () -> some View) -> some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8, content: content).padding(.horizontal)
         }
     }
 
