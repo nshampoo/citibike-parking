@@ -13,16 +13,20 @@ struct HomeView: View {
     @State private var loadError: String?
     @State private var query = ""
     @State private var selectedID: String?
-    @State private var camera: MapCameraPosition = .userLocation(
-        fallback: .region(MKCoordinateRegion(center: SharedStore.fallbackLocation.coordinate,
-                                             latitudinalMeters: 1_500, longitudinalMeters: 1_500)))
+    @State private var camera = Self.followUser
     @State private var visibleRegion: MKCoordinateRegion?
+    /// When set, the list shows docks near this place instead of near you.
+    @State private var destination: Destination?
+    @State private var showingDestinations = false
     /// Per-device preference, so plain UserDefaults (not the App Group) is enough.
     @AppStorage("onlyWithRoom") private var onlyWithRoom = false
 
     /// SwiftUI maps slow down with thousands of annotations, so draw at most this many.
     private static let maxPins = 150
     private static let nearbyCount = 30
+    private static let followUser = MapCameraPosition.userLocation(
+        fallback: .region(MKCoordinateRegion(center: SharedStore.fallbackLocation.coordinate,
+                                             latitudinalMeters: 1_500, longitudinalMeters: 1_500)))
 
     var body: some View {
         NavigationStack {
@@ -35,6 +39,15 @@ struct HomeView: View {
             .searchable(text: $query, prompt: "Search stations")
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) { roomFilterButton }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        selectedID = nil   // close the station sheet first; one sheet at a time
+                        showingDestinations = true
+                    } label: {
+                        Image(systemName: destination == nil ? "flag" : "flag.fill")
+                    }
+                    .accessibilityLabel("Destinations")
+                }
             }
             .sheet(item: selection) { station in
                 StationDetailView(station: station, here: location.location)
@@ -47,6 +60,9 @@ struct HomeView: View {
                 if phase == .active { Task { await load() } }
             }
         }
+        .sheet(isPresented: $showingDestinations) {
+            DestinationsView { show($0) }
+        }
     }
 
     // MARK: Map
@@ -54,6 +70,10 @@ struct HomeView: View {
     private var map: some View {
         Map(position: $camera) {
             UserAnnotation()
+            if let destination {
+                Marker(destination.name, systemImage: "flag.fill", coordinate: destination.coordinate)
+                    .tint(.purple)
+            }
             ForEach(pins) { s in
                 Annotation(s.name, coordinate: s.coordinate) {
                     StationPin(docks: s.docks, isFavorite: favorites.contains(s.id), isSelected: s.id == selectedID,
@@ -85,8 +105,8 @@ struct HomeView: View {
     // MARK: List
 
     private var list: some View {
-        let here = location.location
-        // Distance from the user when known; alphabetical otherwise.
+        // Distance from the destination or the user when known; alphabetical otherwise.
+        let here = destination?.location ?? location.location
         let sorted = here.map { h in stations.sorted { $0.distance(from: h) < $1.distance(from: h) } }
             ?? stations.sorted { $0.name.localizedStandardCompare($1.name) == .orderedAscending }
         let matches = query.isEmpty ? sorted : sorted.filter { $0.name.localizedStandardContains(query) }
@@ -95,11 +115,15 @@ struct HomeView: View {
         let others = matches.filter { !favorites.contains($0.id) && (!onlyWithRoom || $0.hasRoom) }
 
         return List {
-            if !location.isAuthorized { permissionBanner }
+            if let destination {
+                destinationBanner(destination)
+            } else if !location.isAuthorized {
+                permissionBanner
+            }
             if !favs.isEmpty {
                 Section("Favorites") { ForEach(favs) { row($0, here: here) } }
             }
-            Section(query.isEmpty ? (here == nil ? "Stations" : "Nearby") : "Results") {
+            Section(sectionTitle(hasLocation: here != nil)) {
                 // Without a search, only the closest few — the map covers the rest.
                 ForEach(query.isEmpty ? Array(others.prefix(Self.nearbyCount)) : others) { row($0, here: here) }
             }
@@ -139,6 +163,25 @@ struct HomeView: View {
         }
     }
 
+    /// From the destinations sheet: center on the place and list docks around it.
+    private func show(_ d: Destination) {
+        destination = d
+        withAnimation {
+            camera = .region(MKCoordinateRegion(center: d.coordinate, latitudinalMeters: 1_000, longitudinalMeters: 1_000))
+        }
+    }
+
+    private func clearDestination() {
+        destination = nil
+        withAnimation { camera = Self.followUser }
+    }
+
+    private func sectionTitle(hasLocation: Bool) -> String {
+        if !query.isEmpty { return "Results" }
+        if let destination { return "Near \(destination.name)" }
+        return hasLocation ? "Nearby" : "Stations"
+    }
+
     private var selection: Binding<NearbyStation?> {
         Binding(get: { stations.first { $0.id == selectedID } },
                 set: { selectedID = $0?.id })
@@ -162,6 +205,14 @@ struct HomeView: View {
             Image(systemName: onlyWithRoom ? "line.3.horizontal.decrease.circle.fill" : "line.3.horizontal.decrease.circle")
         }
         .accessibilityLabel(onlyWithRoom ? "Show all stations" : "Only stations with room")
+    }
+
+    private func destinationBanner(_ d: Destination) -> some View {
+        HStack {
+            Label("Docks near \(d.name)", systemImage: "flag.fill").foregroundStyle(.purple)
+            Spacer()
+            Button("Back to me", action: clearDestination).font(.subheadline)
+        }
     }
 
     private var permissionBanner: some View {

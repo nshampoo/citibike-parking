@@ -4,6 +4,7 @@ import SwiftUI
 struct DockNearbyApp: App {
     @State private var location = LocationModel()
     @State private var favorites = FavoritesStore()
+    @State private var destinations = DestinationsStore()
 
     var body: some Scene {
         WindowGroup {
@@ -16,6 +17,7 @@ struct DockNearbyApp: App {
             }
             .environment(location)
             .environment(favorites)
+            .environment(destinations)
         }
     }
 }
