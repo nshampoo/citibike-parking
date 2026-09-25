@@ -3,7 +3,7 @@ import CoreLocation
 import BikeKit
 
 struct DockEntry: TimelineEntry {
-    enum State { case loaded, failed, noFavorites, noDestination }
+    enum State { case loaded, failed, noFavorites, noDestination, noCommute }
 
     let date: Date
     let stations: [NearbyStation]
@@ -29,7 +29,10 @@ struct Provider: AppIntentTimelineProvider {
 
     func timeline(for config: DockConfig, in context: Context) async -> Timeline<DockEntry> {
         let entry = await entry(for: config, in: context)
-        return Timeline(entries: [entry], policy: .after(.now.addingTimeInterval(15 * 60)))
+        var refresh = Date.now.addingTimeInterval(15 * 60)
+        // Commute flips at 4am and noon; refresh right then rather than up to 15 minutes late.
+        if config.mode == .commute { refresh = min(refresh, Commute.nextSwitch(after: .now)) }
+        return Timeline(entries: [entry], policy: .after(refresh))
     }
 
     private func entry(for config: DockConfig, in context: Context) async -> DockEntry {
@@ -50,6 +53,11 @@ struct Provider: AppIntentTimelineProvider {
                 return DockEntry(date: .now, stations: [], state: .noDestination)
             }
             here = destination.location
+        case .commute:
+            guard let home = SharedStore.home, let work = SharedStore.work else {
+                return DockEntry(date: .now, stations: [], state: .noCommute)
+            }
+            here = Commute.leg(at: .now) == .toWork ? work.location : home.location
         case .closest, .favorites:
             here = await LocationFetcher.current()
         }

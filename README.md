@@ -4,14 +4,15 @@ A SwiftUI app + Lock Screen widget that shows open Citi Bike docks near you,
 near a destination, or at your favorite stations.
 
 - **Lock Screen widget** (rectangular / circular / inline): each can show *Closest to me*,
-  *My favorites*, or *Near a destination* (long-press → Customize → tap the widget).
+  *My favorites*, *Near a destination*, or *Commute* — near Work 4am–noon, Home otherwise,
+  once both are set (long-press → Customize → tap the widget).
   Rectangular shows up to three dots — open docks inside, short street name below
   ("W 72 St & Amsterdam Ave" → "72nd").
 - **App**: asks for location on first launch (which also unlocks location for the widget).
   The main screen is a full-screen map (pins show open docks) under a draggable sheet
   with search, chips, and the nearby list; tap a pin or row for live counts, a favorite
-  button, and cycling directions. The *Open docks* chip hides full stations. Saved places
-  (Work, Home…) appear as chips and show docks near there — in the app and as a widget mode.
+  button, and cycling directions. The *Open docks* chip hides full stations. Home, Work,
+  and other saved places appear as chips and show docks near there — in the app and as a widget mode.
 - **Siri / Shortcuts**: "How many docks at *station* in DockNearby",
   "Docks near *destination* in DockNearby".
 

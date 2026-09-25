@@ -2,12 +2,13 @@ import AppIntents
 import WidgetKit
 
 enum StationMode: String, AppEnum {
-    case closest, favorites, destination
+    case closest, favorites, destination, commute
 
     // Computed (not `static var x = ...`): Swift 6 rejects mutable globals.
     static var typeDisplayRepresentation: TypeDisplayRepresentation { "Stations" }
     static var caseDisplayRepresentations: [StationMode: DisplayRepresentation] {
-        [.closest: "Closest to me", .favorites: "My favorites", .destination: "Near a destination"]
+        [.closest: "Closest to me", .favorites: "My favorites", .destination: "Near a destination",
+         .commute: DisplayRepresentation(title: "Commute", subtitle: "Work until noon, then Home")]
     }
 }
 

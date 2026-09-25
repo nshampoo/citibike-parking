@@ -23,8 +23,9 @@ struct AboutView: View {
                     feature("map", "Live map", "Every pin shows how many docks are open right now.")
                     feature("parkingsign.circle", "Open docks", "Hide stations that are full.")
                     feature("star.fill", "Favorites", "Star the stations you use most; they stay at the top.")
-                    feature("mappin", "Places", "Save Work, Home, or anywhere, and check the docks there before you arrive.")
+                    feature("mappin", "Places", "Save Home, Work, or anywhere, and check the docks there before you arrive.")
                     feature("lock.iphone", "Lock Screen widget", "Docks nearby, at your favorites, or near a place — without unlocking.")
+                    feature("arrow.triangle.swap", "Commute", "Set Home and Work, and the widget shows docks near Work in the morning and Home after noon.")
                     feature("mic.fill", "Siri", "“How many docks at … in DockNearby” or “Docks near Work in DockNearby.”")
                     feature("bicycle", "Directions", "Hand off to Apple Maps for cycling directions to any station.")
                 }

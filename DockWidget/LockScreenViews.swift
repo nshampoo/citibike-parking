@@ -11,6 +11,7 @@ private func statusText(_ entry: DockEntry) -> String? {
     case .failed: "Couldn't load"
     case .noFavorites: "Star stations in the app"
     case .noDestination: "Pick a destination"
+    case .noCommute: "Set Home & Work in the app"
     case .loaded: entry.stations.isEmpty ? "No stations" : nil
     }
 }
