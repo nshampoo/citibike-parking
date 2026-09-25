@@ -5,6 +5,8 @@
 A SwiftUI app + widgets (home screen and Lock Screen) that show open Citi Bike docks —
 or bikes — near you, near a destination, or at your favorite stations.
 
+- **Station widget** (small / medium): the full rundown of one station — parking, classic
+  bikes, e-bikes — defaulting to your nearest favorite.
 - **Widgets** — home screen (small / medium / large) and Lock Screen (rectangular / circular /
   inline), with a ↻ refresh button on the larger ones. Each can show *Closest to me*,
   *My favorites*, *Near a destination*, or *Commute* — near Work 4am–noon, Home otherwise,
@@ -32,8 +34,8 @@ Data: Citi Bike's public [GBFS 1.1 feed](https://gbfs.lyft.com/gbfs/1.1/bkn/gbfs
 | `project.yml` | XcodeGen spec — **source of truth** for the Xcode project |
 | `BikeKit/` | Local Swift package: GBFS models, `GBFSClient`, `SharedStore` (App Group) |
 | `DockNearby/` | iOS app: onboarding, map (`HomeView`) + draggable sheet (`StationsSheet`), shared `HomeModel` |
-| `DockWidget/` | Widget extension: timeline provider, intents, views, `LocationFetcher` |
-| `Shared/` | Source compiled into both app and widget (`DestinationEntity`) |
+| `DockWidget/` | Widget extension (`ParkItWidgets` bundle): the main widget, the Station widget, intents, `LocationFetcher` |
+| `Shared/` | Source compiled into both app and widget (`DestinationEntity`, `StationEntity`, colors) |
 
 The `.xcodeproj`, Info.plists and entitlements are **generated** and gitignored.
 Change `project.yml`, not Xcode's project settings UI.

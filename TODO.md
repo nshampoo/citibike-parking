@@ -34,6 +34,7 @@ These have compiled cleanly but have never been used on a real device:
 - [ ] **Park | Ride** switch; in Ride, **E-bikes** / **Classic** chips (tap again for any bike); counts on pins, rows, card
 - [ ] Widget **Count** setting: Parking / Any bike / E-bikes / Classic — label in the top row matches
 - [ ] **Home screen widgets** (small / medium / large): header "PARKING · Nearby", ↻ refresh, colored counts; try each mode
+- [ ] **Station widget** (small / medium): defaults to nearest favorite; Edit Widget → pick any station (search works?)
 - [ ] Lock Screen widget, rectangular:
   - [ ] "now ↻" is right-aligned with no gap
   - [ ] tapping ↻ refreshes the counts
