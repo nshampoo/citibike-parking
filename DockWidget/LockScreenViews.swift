@@ -53,7 +53,7 @@ struct RectangularView: View {
             Button(intent: RefreshIntent()) {
                 HStack(spacing: 4) {
                     DataAge(date: entry.date).font(.caption2)
-                    Image(systemName: "arrow.clockwise").font(.system(size: 20))
+                    Image(systemName: "arrow.clockwise").font(.system(size: 10))
                 }
                 .foregroundStyle(.secondary)
             }
