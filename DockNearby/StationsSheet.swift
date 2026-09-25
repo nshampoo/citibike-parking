@@ -184,7 +184,7 @@ struct StationsSheet: View {
 
     private var permissionBanner: some View {
         Section {
-            Label("Location is off, so the widget uses your last known spot.", systemImage: "location.slash")
+            Label("Location is off, so Park It uses your last known spot.", systemImage: "location.slash")
             Button("Open Settings") {
                 if let url = URL(string: UIApplication.openSettingsURLString) { openURL(url) }
             }
