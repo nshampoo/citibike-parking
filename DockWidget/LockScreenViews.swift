@@ -3,7 +3,7 @@ import SwiftUI
 import BikeKit
 
 // Lock Screen widgets render in a single tint, so color can't carry meaning —
-// the dock count itself is the headline. They show just the closest station.
+// the dock count itself is the headline, labeled with a short street name ("72nd").
 
 /// Short text for error/empty states, shared by all accessory sizes.
 private func statusText(_ entry: DockEntry) -> String? {
@@ -14,21 +14,32 @@ private func statusText(_ entry: DockEntry) -> String? {
     }
 }
 
-/// Station name, docks, and bikes — about three lines of space.
+/// Up to three dots side by side: open docks inside, short street name below.
 struct RectangularView: View {
     let entry: DockEntry
 
     var body: some View {
-        if let s = entry.stations.first {
-            VStack(alignment: .leading, spacing: 0) {
-                Text(s.name).font(.headline).lineLimit(1).widgetAccentable()
-                Text("\(s.docks) docks").font(.body.bold())
-                Text("\(s.classic) bikes · \(s.ebikes) e-bikes").font(.caption)
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-        } else {
+        if entry.stations.isEmpty {
             Label(statusText(entry) ?? "", systemImage: "bicycle")
                 .font(.caption)
+        } else {
+            HStack(spacing: 4) {
+                ForEach(entry.stations) { s in
+                    VStack(spacing: 2) {
+                        Text("\(s.docks)")
+                            .font(.title3.bold())
+                            .minimumScaleFactor(0.6)
+                            .frame(width: 36, height: 36)
+                            .background { AccessoryWidgetBackground().clipShape(.circle) }
+                            .widgetAccentable()
+                        Text(s.shortName)
+                            .font(.caption2.weight(.semibold))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.6)
+                    }
+                    .frame(maxWidth: .infinity)
+                }
+            }
         }
     }
 }
@@ -50,7 +61,7 @@ struct CircularView: View {
             } else {
                 VStack(spacing: 0) {
                     Text("\(s.docks)").font(.title2.bold())
-                    Text("docks").font(.caption2)
+                    Text(s.shortName).font(.caption2).lineLimit(1).minimumScaleFactor(0.6)
                 }
             }
         } else {
@@ -59,15 +70,16 @@ struct CircularView: View {
     }
 }
 
-/// One line above the clock. Inline widgets only render a single Text/Label.
+/// One line above the clock, e.g. "72nd 7 · 73rd 2". Inline widgets only render a single Text/Label.
 struct InlineView: View {
     let entry: DockEntry
 
     var body: some View {
-        if let s = entry.stations.first {
-            Label("\(s.docks) docks · \(s.name)", systemImage: "bicycle")
-        } else {
+        if entry.stations.isEmpty {
             Label(statusText(entry) ?? "", systemImage: "bicycle")
+        } else {
+            Label(entry.stations.map { "\($0.shortName) \($0.docks)" }.joined(separator: " · "),
+                  systemImage: "bicycle")
         }
     }
 }

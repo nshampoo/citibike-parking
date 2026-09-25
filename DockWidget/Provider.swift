@@ -34,7 +34,9 @@ struct Provider: AppIntentTimelineProvider {
     private func entry(for config: DockConfig, in context: Context) async -> DockEntry {
         let count = switch context.family {
         case .systemLarge: 6
-        case .accessoryRectangular, .accessoryCircular, .accessoryInline: 1   // Lock Screen: closest only
+        case .accessoryRectangular: 3   // Lock Screen: one dot per station
+        case .accessoryInline: 2        // one line above the clock
+        case .accessoryCircular: 1
         default: 3
         }
         let favorites = SharedStore.favorites

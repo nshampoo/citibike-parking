@@ -5,8 +5,11 @@ with classic/e-bike counts and a tap-to-refresh button.
 
 - **Widget** (home screen: medium / large; Lock Screen: rectangular / circular / inline): each widget can show *Closest to me* or *My favorites*
   (long-press → Edit Widget). Refresh button is an interactive `AppIntent` (iOS 17+).
-- **App**: asks for location on first launch (which also unlocks location for the widget),
-  and has a searchable station list where you star favorites.
+  The Lock Screen rectangular widget shows up to three dots — open docks inside, short
+  street name below ("W 72 St & Amsterdam Ave" → "72nd").
+- **App**: asks for location on first launch (which also unlocks location for the widget).
+  The main screen is a map of stations (pins show open docks) above a nearby list;
+  tap a pin or row for live counts and a favorite button.
 
 Data: Citi Bike's public [GBFS 1.1 feed](https://gbfs.lyft.com/gbfs/1.1/bkn/gbfs.json) — no API key.
 
@@ -16,7 +19,7 @@ Data: Citi Bike's public [GBFS 1.1 feed](https://gbfs.lyft.com/gbfs/1.1/bkn/gbfs
 | --- | --- |
 | `project.yml` | XcodeGen spec — **source of truth** for the Xcode project |
 | `BikeKit/` | Local Swift package: GBFS models, `GBFSClient`, `SharedStore` (App Group) |
-| `DockNearby/` | iOS app: onboarding, station list, favorites |
+| `DockNearby/` | iOS app: onboarding, map + nearby list, station sheet, favorites |
 | `DockWidget/` | Widget extension: timeline provider, intents, views, `LocationFetcher` |
 
 The `.xcodeproj`, Info.plists and entitlements are **generated** and gitignored.
