@@ -57,9 +57,6 @@ public struct NearbyStation: Identifiable, Hashable, Sendable {
         self.longitude = longitude
     }
 
-    /// At least one open dock.
-    public var hasRoom: Bool { docks > 0 }
-
     public var coordinate: CLLocationCoordinate2D { .init(latitude: latitude, longitude: longitude) }
 
     public func distance(from here: CLLocation) -> CLLocationDistance {

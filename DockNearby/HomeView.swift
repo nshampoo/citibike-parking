@@ -75,7 +75,7 @@ struct HomeView: View {
                     // A real Button (not onTapGesture) so VoiceOver can read and activate pins.
                     Button { model.select(s, moveMap: false) } label: {
                         StationPin(docks: s.docks, isFavorite: favorites.contains(s.id),
-                                   isSelected: s.id == model.selectedID, isDimmed: onlyWithRoom && !s.hasRoom,
+                                   isSelected: s.id == model.selectedID, isDimmed: onlyWithRoom && !s.has(.dock),
                                    isCompact: compact && s.id != model.selectedID)
                     }
                     .buttonStyle(.plain)

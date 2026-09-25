@@ -31,13 +31,13 @@ public actor GBFSClient {
     // MARK: Public API
 
     /// The `count` closest installed stations, optionally limited to `only` IDs
-    /// and to stations that have room to dock.
+    /// and to stations that have at least one of `mustHave` (an open dock, an e-bike…).
     public func nearest(to here: CLLocation, count: Int = 3, only: Set<String>? = nil,
-                        needsRoom: Bool = false) async throws -> [NearbyStation] {
+                        mustHave: Need? = nil) async throws -> [NearbyStation] {
         async let info = stationInfo()
         async let statuses = stationStatus()
         return try await Self.merge(info: info, statuses: statuses, here: here, count: count, only: only,
-                                    needsRoom: needsRoom)
+                                    mustHave: mustHave)
     }
 
     /// Station ID → name from the daily cache, no live status — cheap enough for Siri/Shortcuts lookups.
@@ -53,7 +53,7 @@ public actor GBFSClient {
     // MARK: Pure logic (unit-tested)
 
     static func merge(info: [StationInfo], statuses: [StationStatus], here: CLLocation,
-                      count: Int, only: Set<String>?, needsRoom: Bool = false) -> [NearbyStation] {
+                      count: Int, only: Set<String>?, mustHave: Need? = nil) -> [NearbyStation] {
         let byId = Dictionary(statuses.map { ($0.stationId, $0) }, uniquingKeysWith: { a, _ in a })
         return info
             .compactMap { s -> NearbyStation? in
@@ -69,7 +69,7 @@ public actor GBFSClient {
                     capacity: (s.capacity ?? 0) > 0 ? s.capacity : nil,
                     latitude: s.lat, longitude: s.lon)
             }
-            .filter { !needsRoom || $0.hasRoom }
+            .filter { mustHave.map($0.has) ?? true }
             .sorted { $0.meters < $1.meters }
             .prefix(count)
             .map { $0 }

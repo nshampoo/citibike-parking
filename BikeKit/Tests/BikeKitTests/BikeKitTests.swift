@@ -80,12 +80,12 @@ private func status(_ id: String, bikes: Int = 5, ebikes: Int? = 2, docks: Int =
     #expect(result.map(\.id) == ["a", "c"])
 }
 
-@Test func needsRoomSkipsFullStations() {
+@Test func mustHaveDockSkipsFullStations() {
     let result = GBFSClient.merge(
         info: [info("full", lat: 40.7782), info("one", lat: 40.779), info("two", lat: 40.78), info("closed", lat: 40.781)],
         statuses: [status("full", docks: 0), status("one", docks: 1), status("two", docks: 2),
                    status("closed", docks: 9, returning: 0)],
-        here: here, count: 3, only: nil, needsRoom: true)
+        here: here, count: 3, only: nil, mustHave: .dock)
     #expect(result.map(\.id) == ["one", "two"])
 }
 
@@ -187,4 +187,40 @@ func commuteLegByTime(hour: Int, minute: Int, expected: Commute.Leg) {
     #expect(NearbyStation.serviceArea(stations, contains: CLLocation(latitude: 40.95, longitude: -73.98)))  // ~19 km north
     #expect(!NearbyStation.serviceArea(stations, contains: CLLocation(latitude: 37.33, longitude: -122.01))) // Cupertino
     #expect(NearbyStation.serviceArea([], contains: CLLocation(latitude: 37.33, longitude: -122.01)))        // not loaded yet
+}
+
+// MARK: - Needs (docks vs bikes)
+
+private func station(docks: Int = 4, classic: Int = 3, ebikes: Int = 2, renting: Bool = true) -> NearbyStation {
+    NearbyStation(id: "s", name: "S", meters: 0, docks: docks, classic: classic, ebikes: ebikes,
+                  renting: renting, latitude: 40.78, longitude: -73.98)
+}
+
+@Test func countsEachNeed() {
+    let s = station()
+    #expect(s.count(of: .dock) == 4)
+    #expect(s.count(of: .anyBike) == 5)
+    #expect(s.count(of: .eBike) == 2)
+    #expect(s.count(of: .classicBike) == 3)
+}
+
+@Test func bikesAtANonRentingStationDontCount() {
+    let s = station(renting: false)
+    #expect(s.count(of: .anyBike) == 0)
+    #expect(!s.has(.eBike))
+    #expect(s.has(.dock))   // you can still return a bike
+}
+
+@Test func mustHaveEBikeFiltersToStationsWithEBikes() {
+    let result = GBFSClient.merge(
+        info: [info("none", lat: 40.7782), info("some", lat: 40.779)],
+        statuses: [status("none", bikes: 4, ebikes: 0), status("some", bikes: 4, ebikes: 1)],
+        here: here, count: 3, only: nil, mustHave: .eBike)
+    #expect(result.map(\.id) == ["some"])
+}
+
+@Test func nounsAreSingularForOne() {
+    #expect(Need.dock.noun(for: 1) == "dock")
+    #expect(Need.eBike.noun(for: 3) == "e-bikes")
+    #expect(Need.anyBike.noun(for: 0) == "bikes")
 }
