@@ -28,6 +28,7 @@ targets:
     type: application
     platform: iOS
     sources: [DockNearby, Shared]
+    scheme: {}                      # shared scheme, so it's generated rather than auto-created
     dependencies:
       - package: BikeKit
       - target: DockWidget          # embeds the widget extension in the app
@@ -53,6 +54,12 @@ targets:
     type: app-extension
     platform: iOS
     sources: [DockWidget, Shared]
+    scheme:
+      # Running this scheme shows the widget directly. Xcode's default is the home
+      # screen medium size, which this widget doesn't support.
+      environmentVariables:
+        _XCWidgetKind: DockWidget
+        _XCWidgetFamily: accessoryRectangular
     dependencies:
       - package: BikeKit
       - sdk: WidgetKit.framework
