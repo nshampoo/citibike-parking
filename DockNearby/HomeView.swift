@@ -63,7 +63,7 @@ struct HomeView: View {
         Button { model.showingAbout = true } label: {
             Image(systemName: "info")
                 .font(.body.weight(.semibold))
-                .frame(width: 44, height: 44)
+                .frame(width: 32, height: 32)
         }
         .glassCircle()
         .accessibilityLabel("About DockNearby")
@@ -84,11 +84,13 @@ struct HomeView: View {
 
 private extension View {
     /// A floating round button: Liquid Glass on iOS 26, a material before.
+    /// (Use the glass button style, not .glassEffect(.interactive()) on a plain button —
+    /// that glass swallows the tap and the action never runs.)
     @ViewBuilder func glassCircle() -> some View {
         if #available(iOS 26, *) {
-            buttonStyle(.plain).glassEffect(.regular.interactive(), in: .circle)
+            buttonStyle(.glass).buttonBorderShape(.circle)
         } else {
-            buttonStyle(.plain).background(.regularMaterial, in: .circle).shadow(radius: 2)
+            buttonStyle(.plain).padding(6).background(.regularMaterial, in: .circle).shadow(radius: 2)
         }
     }
 
