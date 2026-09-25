@@ -11,7 +11,7 @@ struct DockNearbyApp: App {
                 if location.status == .notDetermined {
                     OnboardingView { location.requestPermission() }
                 } else {
-                    StationListView()
+                    HomeView()
                 }
             }
             .environment(location)

@@ -63,11 +63,3 @@ public struct NearbyStation: Identifiable, Hashable, Sendable {
         here.distance(from: CLLocation(latitude: latitude, longitude: longitude))
     }
 }
-
-/// Lightweight station for the app's searchable list.
-public struct StationSummary: Identifiable, Hashable, Sendable {
-    public let id: String
-    public let name: String
-    public let latitude: Double
-    public let longitude: Double
-}

@@ -94,6 +94,6 @@ func liveFeedReturnsNearbyStations() async throws {
     #expect(stations.count == 3)
     #expect(stations[0].meters < 1_000)
     print(stations.map { "\($0.name): \($0.docks) docks, \($0.classic)+\($0.ebikes) bikes, \(Int($0.meters))m" })
-    let all = try await client.allStations()
+    let all = try await client.stations(near: here)
     #expect(all.count > 1_000)
 }

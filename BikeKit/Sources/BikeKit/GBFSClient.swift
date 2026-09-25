@@ -30,13 +30,6 @@ public actor GBFSClient {
 
     // MARK: Public API
 
-    /// Every station (id, name, location), sorted by name — for search.
-    public func allStations() async throws -> [StationSummary] {
-        try await stationInfo()
-            .map { StationSummary(id: $0.stationId, name: $0.name, latitude: $0.lat, longitude: $0.lon) }
-            .sorted { $0.name.localizedStandardCompare($1.name) == .orderedAscending }
-    }
-
     /// The `count` closest installed stations, optionally limited to `only` IDs.
     public func nearest(to here: CLLocation, count: Int = 3, only: Set<String>? = nil) async throws -> [NearbyStation] {
         async let info = stationInfo()
