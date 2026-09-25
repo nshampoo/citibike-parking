@@ -39,8 +39,8 @@ Star the stations you use most and save places you ride to. Tap a place to see o
 SIRI AND SHORTCUTS
 "How many docks at 72nd in Park It?" or "Docks near Work in Park It."
 
-OPEN DOCKS FILTER
-Hide full stations with one tap.
+PARK OR RIDE
+Flip between open docks and bikes you can grab. Want an e-bike? Filter to just e-bikes (or just classics), on the map and on your Lock Screen.
 
 PRIVATE BY DESIGN
 No account, no ads, no tracking. Your location never leaves your phone.

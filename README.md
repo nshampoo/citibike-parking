@@ -8,13 +8,16 @@ near a destination, or at your favorite stations.
 - **Lock Screen widget** (rectangular / circular / inline): each can show *Closest to me*,
   *My favorites*, *Near a destination*, or *Commute* — near Work 4am–noon, Home otherwise,
   once both are set (long-press → Customize → tap the widget).
-  Rectangular shows up to three dots — open docks inside, short street name below
+  Each widget also picks what to **Count**: open docks, any bike, e-bikes, or classic bikes.
+  Rectangular shows up to three dots — the count inside, short street name below
   ("W 72 St & Amsterdam Ave" → "72nd") — under a "↻ 5 min ago" row: tap it to refresh
   (an interactive `AppIntent` button; runs once the phone is unlocked).
 - **App**: asks for location on first launch (which also unlocks location for the widget).
   The main screen is a full-screen map (pins show open docks) under a draggable sheet
   with search, chips, and the nearby list; tap a pin or row for live counts, a favorite
-  button, and cycling directions. The *Open docks* chip hides full stations. Home, Work,
+  button, and cycling directions. A **Park | Ride** switch flips everything between open docks
+  and available bikes (with *E-bikes* / *Classic* chips in Ride); the hide-empty chip hides
+  stations with none. Home, Work,
   and other saved places appear as chips and show docks near there — in the app and as a widget mode.
 - **Siri / Shortcuts**: "How many docks at *station* in Park It",
   "Docks near *destination* in Park It".

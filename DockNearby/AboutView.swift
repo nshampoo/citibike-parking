@@ -21,10 +21,11 @@ struct AboutView: View {
 
                 Section("What it does") {
                     feature("map", "Live map", "Every pin shows how many docks are open right now.")
-                    feature("parkingsign.circle", "Open docks", "Hide stations that are full.")
+                    feature("arrow.left.arrow.right", "Park or Ride", "Switch between open docks and bikes to grab — or just e-bikes, or just classics.")
+                    feature("parkingsign.circle", "Hide empty", "Hide stations with no open docks (or no bikes).")
                     feature("star.fill", "Favorites", "Star the stations you use most; they stay at the top.")
                     feature("mappin", "Places", "Save Home, Work, or anywhere, and check the docks there before you arrive.")
-                    feature("lock.iphone", "Lock Screen widget", "Docks nearby, at your favorites, or near a place — without unlocking.")
+                    feature("lock.iphone", "Lock Screen widget", "Docks or bikes nearby, at your favorites, or near a place — without unlocking.")
                     feature("arrow.triangle.swap", "Commute", "Set Home and Work, and the widget shows docks near Work in the morning and Home after noon.")
                     feature("mic.fill", "Siri", "“How many docks at … in Park It” or “Docks near Work in Park It.”")
                     feature("bicycle", "Directions", "Hand off to Apple Maps for cycling directions to any station.")

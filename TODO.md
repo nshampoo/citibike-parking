@@ -31,6 +31,8 @@ These have compiled cleanly but have never been used on a real device:
 - [ ] **Set Home / Set Work** from the chips; long-press → Change… / Delete; **+** to add another place
 - [ ] Tap a place chip → map flies there, list shows "Near Work"; tap again to go back
 - [ ] **Open docks** chip dims full pins and hides them from the list
+- [ ] **Park | Ride** switch; in Ride, **E-bikes** / **Classic** chips (tap again for any bike); counts on pins, rows, card
+- [ ] Widget **Count** setting: Open docks / Any bike / E-bikes / Classic — label in the top row matches
 - [ ] Lock Screen widget, rectangular:
   - [ ] "now ↻" is right-aligned with no gap
   - [ ] tapping ↻ refreshes the counts
@@ -65,7 +67,6 @@ These have compiled cleanly but have never been used on a real device:
 
 - **Last-mile planner:** subway most of the way, then Citi Bike the rest.
   v1: the best dock near the destination plus the best bike pickup station. v2: compare subway travel times (MapKit can only give transit *times*, not routes, so the transit leg hands off to Apple Maps).
-- **Find a bike mode:** a chip that switches pins to bikes / e-bikes available
 - **Walk-from-dock time** in destination view
 - **Ride Live Activity:** live dock counts at your destination while you ride
 - **Apple Watch:** docks at your stop at a glance
