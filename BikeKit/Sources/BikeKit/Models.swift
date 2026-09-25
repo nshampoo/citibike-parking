@@ -67,18 +67,33 @@ public struct NearbyStation: Identifiable, Hashable, Sendable {
     }
 }
 
-/// A saved place ("Work", "Home") whose nearby docks you want to see before you get there.
+/// A saved place whose nearby docks you want to see before you get there.
+/// Home and Work are special: at most one of each, and they power commute mode.
 public struct Destination: Codable, Identifiable, Hashable, Sendable {
+    public enum Kind: String, Codable, Sendable { case home, work, other }
+
     public let id: UUID
     public var name: String
+    public var kind: Kind
     public let latitude: Double
     public let longitude: Double
 
-    public init(id: UUID = UUID(), name: String, latitude: Double, longitude: Double) {
+    public init(id: UUID = UUID(), name: String, kind: Kind = .other, latitude: Double, longitude: Double) {
         self.id = id
         self.name = name
+        self.kind = kind
         self.latitude = latitude
         self.longitude = longitude
+    }
+
+    // Places saved before Home/Work existed have no "kind"; treat them as .other.
+    public init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = try c.decode(UUID.self, forKey: .id)
+        name = try c.decode(String.self, forKey: .name)
+        kind = try c.decodeIfPresent(Kind.self, forKey: .kind) ?? .other
+        latitude = try c.decode(Double.self, forKey: .latitude)
+        longitude = try c.decode(Double.self, forKey: .longitude)
     }
 
     public var location: CLLocation { CLLocation(latitude: latitude, longitude: longitude) }

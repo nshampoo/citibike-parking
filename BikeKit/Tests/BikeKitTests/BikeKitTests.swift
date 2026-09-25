@@ -139,3 +139,41 @@ func shortensStationNames(name: String, expected: String) {
     #expect([1, 2, 3, 4, 11, 12, 13, 22, 101, 112].map(StationName.ordinal)
             == ["1st", "2nd", "3rd", "4th", "11th", "12th", "13th", "22nd", "101st", "112th"])
 }
+
+// MARK: - Destinations & commute
+
+@Test func destinationsWithoutKindDecodeAsOther() throws {
+    let json = #"[{"id":"6F1C2B8E-8E0A-4C2B-9C8E-0B0D6B4B2A11","name":"Gym","latitude":40.7,"longitude":-73.9}]"#
+    let decoded = try JSONDecoder().decode([Destination].self, from: Data(json.utf8))
+    #expect(decoded[0].kind == .other)
+}
+
+private let nyc: Calendar = {
+    var c = Calendar(identifier: .gregorian)
+    c.timeZone = TimeZone(identifier: "America/New_York")!
+    return c
+}()
+
+private func at(_ hour: Int, _ minute: Int = 0, day: Int = 24) -> Date {
+    nyc.date(from: DateComponents(year: 2026, month: 9, day: day, hour: hour, minute: minute))!
+}
+
+@Test(arguments: [
+    (3, 59, Commute.Leg.toHome),
+    (4, 0, .toWork),
+    (8, 30, .toWork),
+    (11, 59, .toWork),
+    (12, 0, .toHome),
+    (18, 0, .toHome),
+    (23, 30, .toHome),
+])
+func commuteLegByTime(hour: Int, minute: Int, expected: Commute.Leg) {
+    #expect(Commute.leg(at: at(hour, minute), calendar: nyc) == expected)
+}
+
+@Test func commuteNextSwitch() {
+    #expect(Commute.nextSwitch(after: at(9), calendar: nyc) == at(12))
+    #expect(Commute.nextSwitch(after: at(2), calendar: nyc) == at(4))
+    #expect(Commute.nextSwitch(after: at(13), calendar: nyc) == at(4, day: 25))
+    #expect(Commute.nextSwitch(after: at(12), calendar: nyc) == at(4, day: 25))   // exactly at a switch → the next one
+}

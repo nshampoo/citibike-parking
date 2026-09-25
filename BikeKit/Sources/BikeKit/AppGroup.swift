@@ -35,6 +35,9 @@ public enum SharedStore {
         set { AppGroup.defaults.set(try? JSONEncoder().encode(newValue), forKey: destinationsKey) }
     }
 
+    public static var home: Destination? { destinations.first { $0.kind == .home } }
+    public static var work: Destination? { destinations.first { $0.kind == .work } }
+
     /// Last known user location, used when the widget can't get a fresh fix.
     public static var lastLocation: CLLocation? {
         get {
