@@ -1,8 +1,9 @@
 import SwiftUI
 import CoreLocation
+import MapKit
 import BikeKit
 
-/// The sheet shown when you tap a pin or a list row: live counts plus a favorite button.
+/// The sheet shown when you tap a pin or a list row: live counts, favorite, and directions.
 struct StationDetailView: View {
     let station: NearbyStation
     let here: CLLocation?
@@ -31,17 +32,36 @@ struct StationDetailView: View {
                     .font(.footnote).foregroundStyle(.orange)
             }
 
-            Button { favorites.toggle(station.id) } label: {
-                Label(starred ? "Remove from Favorites" : "Add to Favorites",
-                      systemImage: starred ? "star.slash" : "star.fill")
-                    .frame(maxWidth: .infinity)
+            HStack {
+                Button { favorites.toggle(station.id) } label: {
+                    Label(starred ? "Unfavorite" : "Favorite", systemImage: starred ? "star.slash" : "star.fill")
+                        .frame(maxWidth: .infinity)
+                }
+                .tint(starred ? .gray : .yellow)
+
+                Button(action: openDirections) {
+                    Label("Directions", systemImage: "bicycle")
+                        .frame(maxWidth: .infinity)
+                }
+                .tint(.blue)
             }
             .buttonStyle(.borderedProminent)
-            .tint(starred ? .gray : .yellow)
             .controlSize(.large)
         }
         .padding()
         .frame(maxHeight: .infinity, alignment: .top)
+    }
+
+    /// Hands off to Apple Maps with cycling directions to the station.
+    private func openDirections() {
+        let item: MKMapItem
+        if #available(iOS 26, *) {
+            item = MKMapItem(location: CLLocation(latitude: station.latitude, longitude: station.longitude), address: nil)
+        } else {
+            item = MKMapItem(placemark: MKPlacemark(coordinate: station.coordinate))
+        }
+        item.name = station.name
+        item.openInMaps(launchOptions: [MKLaunchOptionsDirectionsModeKey: MKLaunchOptionsDirectionsModeCycling])
     }
 
     private func stat(_ value: Int, _ label: String, color: Color = .primary) -> some View {
