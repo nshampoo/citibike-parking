@@ -70,7 +70,10 @@ public struct NearbyStation: Identifiable, Hashable, Sendable {
 /// A saved place whose nearby docks you want to see before you get there.
 /// Home and Work are special: at most one of each, and they power commute mode.
 public struct Destination: Codable, Identifiable, Hashable, Sendable {
-    public enum Kind: String, Codable, Sendable { case home, work, other }
+    public enum Kind: String, Codable, Sendable, Identifiable {
+        case home, work, other
+        public var id: Self { self }
+    }
 
     public let id: UUID
     public var name: String

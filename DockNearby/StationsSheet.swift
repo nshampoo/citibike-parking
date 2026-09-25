@@ -13,7 +13,8 @@ struct StationsSheet: View {
     @AppStorage("onlyWithRoom") private var onlyWithRoom = false
 
     @FocusState private var searchFocused: Bool
-    @State private var addingDestination = false
+    /// Which kind of place the add screen is open for, if any.
+    @State private var adding: Destination.Kind?
 
     /// Without a search, only the closest few — the map covers the rest.
     private static let nearbyCount = 30
@@ -34,8 +35,8 @@ struct StationsSheet: View {
         .onChange(of: searchFocused) { _, focused in
             if focused { model.detent = .large }
         }
-        .sheet(isPresented: $addingDestination) {
-            NavigationStack { AddDestinationView() }
+        .sheet(item: $adding) { kind in
+            NavigationStack { AddDestinationView(kind: kind) }
         }
         .sheet(isPresented: $model.showingAbout) { AboutView() }
     }
@@ -62,27 +63,19 @@ struct StationsSheet: View {
         .background(.fill.tertiary, in: .capsule)
     }
 
-    /// "Open docks" filter, then saved places (tap to see docks there, long-press to delete), then +.
+    /// "Open docks" filter, Home and Work, other saved places, then +.
+    /// Tap a place to see docks there; long-press to change or delete it.
     private var chips: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
                 Chip(title: "Open docks", systemImage: "parkingsign.circle", isOn: onlyWithRoom) {
                     onlyWithRoom.toggle()
                 }
-                ForEach(destinations.all) { d in
-                    let isOn = model.destination?.id == d.id
-                    Chip(title: d.name, systemImage: icon(for: d.name), isOn: isOn) {
-                        isOn ? model.clearDestination() : model.show(d)
-                    }
-                    .contextMenu {
-                        Button("Delete", systemImage: "trash", role: .destructive) {
-                            if isOn { model.clearDestination() }
-                            destinations.remove(d.id)
-                        }
-                    }
-                }
-                Chip(title: destinations.all.isEmpty ? "Add place" : nil, systemImage: "plus", isOn: false) {
-                    addingDestination = true
+                fixedPlaceChip(.home, destinations.home)
+                fixedPlaceChip(.work, destinations.work)
+                ForEach(destinations.others) { placeChip($0, icon: "mappin") }
+                Chip(title: destinations.others.isEmpty ? "Add place" : nil, systemImage: "plus", isOn: false) {
+                    adding = .other
                 }
                 .accessibilityLabel("Add place")
             }
@@ -90,11 +83,31 @@ struct StationsSheet: View {
         }
     }
 
-    private func icon(for name: String) -> String {
-        switch name.lowercased() {
-        case let n where n.contains("home"): "house.fill"
-        case let n where n.contains("work") || n.contains("office"): "briefcase.fill"
-        default: "mappin"
+    /// Home or Work: "Set Home" until it's saved, then a normal place chip.
+    @ViewBuilder private func fixedPlaceChip(_ kind: Destination.Kind, _ place: Destination?) -> some View {
+        let icon = kind == .home ? "house" : "briefcase"
+        if let place {
+            placeChip(place, icon: icon + ".fill")
+        } else {
+            Chip(title: kind == .home ? "Set Home" : "Set Work", systemImage: icon, isOn: false, isMuted: true) {
+                adding = kind
+            }
+        }
+    }
+
+    private func placeChip(_ d: Destination, icon: String) -> some View {
+        let isOn = model.destination?.id == d.id
+        return Chip(title: d.name, systemImage: icon, isOn: isOn) {
+            isOn ? model.clearDestination() : model.show(d)
+        }
+        .contextMenu {
+            if d.kind != .other {
+                Button("Change \(d.name)…", systemImage: "pencil") { adding = d.kind }
+            }
+            Button("Delete", systemImage: "trash", role: .destructive) {
+                if isOn { model.clearDestination() }
+                destinations.remove(d.id)
+            }
         }
     }
 
@@ -181,11 +194,12 @@ struct StationsSheet: View {
     }
 }
 
-/// A capsule toggle under the search bar. Filled when on.
+/// A capsule toggle under the search bar. Filled when on; muted for not-yet-set places.
 struct Chip: View {
     let title: String?
     let systemImage: String
     let isOn: Bool
+    var isMuted = false
     let action: () -> Void
 
     var body: some View {
@@ -200,7 +214,7 @@ struct Chip: View {
             .font(.subheadline.weight(.medium))
             .padding(.horizontal, 12)
             .padding(.vertical, 7)
-            .foregroundStyle(isOn ? AnyShapeStyle(.white) : AnyShapeStyle(.primary))
+            .foregroundStyle(isOn ? AnyShapeStyle(.white) : isMuted ? AnyShapeStyle(.secondary) : AnyShapeStyle(.primary))
             .background(isOn ? AnyShapeStyle(.tint) : AnyShapeStyle(.fill.tertiary), in: .capsule)
         }
         .buttonStyle(.plain)

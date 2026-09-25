@@ -10,8 +10,14 @@ import BikeKit
 final class DestinationsStore {
     private(set) var all: [Destination] = SharedStore.destinations
 
-    func add(name: String, at coordinate: CLLocationCoordinate2D) {
-        all.append(Destination(name: name, latitude: coordinate.latitude, longitude: coordinate.longitude))
+    var home: Destination? { all.first { $0.kind == .home } }
+    var work: Destination? { all.first { $0.kind == .work } }
+    var others: [Destination] { all.filter { $0.kind == .other } }
+
+    /// Adds a place. Home and Work replace any existing one of the same kind.
+    func add(name: String, kind: Destination.Kind = .other, at coordinate: CLLocationCoordinate2D) {
+        if kind != .other { all.removeAll { $0.kind == kind } }
+        all.append(Destination(name: name, kind: kind, latitude: coordinate.latitude, longitude: coordinate.longitude))
         save()
     }
 

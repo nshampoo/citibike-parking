@@ -2,8 +2,10 @@ import SwiftUI
 import MapKit
 import BikeKit
 
-/// Address/place search; picking a result asks for a name ("Work"), then saves it.
+/// Address/place search. For Home/Work, picking a result saves it right away;
+/// for other places it asks for a name first.
 struct AddDestinationView: View {
+    var kind: Destination.Kind = .other
     @Environment(DestinationsStore.self) private var destinations
     @Environment(\.dismiss) private var dismiss
 
@@ -20,8 +22,13 @@ struct AddDestinationView: View {
     var body: some View {
         List(results, id: \.self) { item in
             Button {
-                picked = item
-                name = item.name ?? ""
+                if kind == .other {
+                    picked = item
+                    name = item.name ?? ""
+                } else {
+                    destinations.add(name: kind == .home ? "Home" : "Work", kind: kind, at: item.placeCoordinate)
+                    dismiss()
+                }
             } label: {
                 VStack(alignment: .leading) {
                     Text(item.name ?? "Unknown place")
@@ -32,7 +39,7 @@ struct AddDestinationView: View {
             }
             .tint(.primary)
         }
-        .navigationTitle("Add Place")
+        .navigationTitle(title)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
@@ -43,6 +50,14 @@ struct AddDestinationView: View {
             TextField("Work, Home…", text: $name)
             Button("Save") { save() }
             Button("Cancel", role: .cancel) {}
+        }
+    }
+
+    private var title: String {
+        switch kind {
+        case .home: "Set Home"
+        case .work: "Set Work"
+        case .other: "Add Place"
         }
     }
 
