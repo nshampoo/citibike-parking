@@ -1,5 +1,6 @@
 import AppIntents
 import WidgetKit
+import BikeKit
 
 enum StationMode: String, AppEnum {
     case closest, favorites, destination, commute
@@ -9,6 +10,25 @@ enum StationMode: String, AppEnum {
     static var caseDisplayRepresentations: [StationMode: DisplayRepresentation] {
         [.closest: "Closest to me", .favorites: "My favorites", .destination: "Near a destination",
          .commute: DisplayRepresentation(title: "Commute", subtitle: "Work until noon, then Home")]
+    }
+}
+
+/// What the widget counts at each station — BikeKit's Need, as a widget setting.
+enum CountKind: String, AppEnum {
+    case docks, bikes, ebikes, classic
+
+    static var typeDisplayRepresentation: TypeDisplayRepresentation { "Count" }
+    static var caseDisplayRepresentations: [CountKind: DisplayRepresentation] {
+        [.docks: "Open docks", .bikes: "Any bike", .ebikes: "E-bikes", .classic: "Classic bikes"]
+    }
+
+    var need: Need {
+        switch self {
+        case .docks: .dock
+        case .bikes: .anyBike
+        case .ebikes: .eBike
+        case .classic: .classicBike
+        }
     }
 }
 
@@ -23,7 +43,10 @@ struct DockConfig: WidgetConfigurationIntent {
     @Parameter(title: "Destination")
     var destination: DestinationEntity?
 
-    @Parameter(title: "Only stations with room", default: false)
+    @Parameter(title: "Count", default: .docks)
+    var counting: CountKind
+
+    @Parameter(title: "Hide empty stations", default: false)
     var needsRoom: Bool
 
     // Only ask for a destination when that mode is picked.
@@ -32,11 +55,13 @@ struct DockConfig: WidgetConfigurationIntent {
             Summary {
                 \.$mode
                 \.$destination
+                \.$counting
                 \.$needsRoom
             }
         } otherwise: {
             Summary {
                 \.$mode
+                \.$counting
                 \.$needsRoom
             }
         }

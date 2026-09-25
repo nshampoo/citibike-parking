@@ -5,6 +5,15 @@ import BikeKit
 // Lock Screen widgets render in a single tint, so color can't carry meaning —
 // the dock count itself is the headline, labeled with a short street name ("72nd").
 
+/// Icon for what's being counted: a parking sign for docks, a bolt for e-bikes, else a bike.
+private func symbol(for need: Need) -> String {
+    switch need {
+    case .dock: "parkingsign"
+    case .eBike: "bolt.fill"
+    case .anyBike, .classicBike: "bicycle"
+    }
+}
+
 /// Short text for error/empty states, shared by all accessory sizes.
 private func statusText(_ entry: DockEntry) -> String? {
     switch entry.state {
@@ -32,7 +41,7 @@ struct RectangularView: View {
                 HStack(spacing: 4) {
                     ForEach(entry.stations) { s in
                         VStack(spacing: 1) {
-                            DockDot(docks: s.docks)
+                            DockDot(count: s.count(of: entry.need))
                             Text(s.shortName)
                                 .font(.caption2.weight(.semibold))
                                 .lineLimit(1)
@@ -49,6 +58,10 @@ struct RectangularView: View {
     /// shrink to their content, so a frame inside the label wouldn't push it over.
     private var refreshRow: some View {
         HStack(spacing: 0) {
+            // What the dots count, e.g. "E-BIKES".
+            Text(entry.need.noun(for: 2).uppercased())
+                .font(.caption2.weight(.semibold))
+                .foregroundStyle(.secondary)
             Spacer(minLength: 0)
             Button(intent: RefreshIntent()) {
                 HStack(spacing: 4) {
@@ -69,12 +82,12 @@ struct RectangularView: View {
 /// A solid light circle with the dock count cut out of it. Lock Screen widgets
 /// render in one tint, so "dark text on light" means letting the wallpaper show through.
 private struct DockDot: View {
-    let docks: Int
+    let count: Int
 
     var body: some View {
         ZStack {
             Circle()
-            Text("\(docks)")
+            Text("\(count)")
                 .font(.headline.weight(.heavy))
                 .minimumScaleFactor(0.6)
                 .blendMode(.destinationOut)
@@ -105,17 +118,18 @@ struct CircularView: View {
 
     var body: some View {
         if let s = entry.stations.first {
+            let n = s.count(of: entry.need)
             if let capacity = s.capacity {
-                Gauge(value: Double(min(s.docks, capacity)), in: 0...Double(capacity)) {
-                    Image(systemName: "bicycle")
+                Gauge(value: Double(min(n, capacity)), in: 0...Double(capacity)) {
+                    Image(systemName: symbol(for: entry.need))
                 } currentValueLabel: {
-                    Text("\(s.docks)")
+                    Text("\(n)")
                 }
                 .gaugeStyle(.accessoryCircularCapacity)
                 .widgetAccentable()
             } else {
                 VStack(spacing: 0) {
-                    Text("\(s.docks)").font(.title2.bold())
+                    Text("\(n)").font(.title2.bold())
                     Text(s.shortName).font(.caption2).lineLimit(1).minimumScaleFactor(0.6)
                 }
             }
@@ -133,8 +147,8 @@ struct InlineView: View {
         if entry.stations.isEmpty {
             Label(statusText(entry) ?? "", systemImage: "bicycle")
         } else {
-            Label(entry.stations.map { "\($0.shortName) \($0.docks)" }.joined(separator: " · "),
-                  systemImage: "bicycle")
+            Label(entry.stations.map { "\($0.shortName) \($0.count(of: entry.need))" }.joined(separator: " · "),
+                  systemImage: symbol(for: entry.need))
         }
     }
 }
