@@ -3,22 +3,34 @@ import CoreLocation
 import MapKit
 import BikeKit
 
-/// The sheet shown when you tap a pin or a list row: live counts, favorite, and directions.
+/// The station card shown in the sheet when you tap a pin or a row: live counts, favorite, and directions.
 struct StationDetailView: View {
     let station: NearbyStation
     let here: CLLocation?
+    let onClose: () -> Void
     @Environment(FavoritesStore.self) private var favorites
 
     var body: some View {
         let starred = favorites.contains(station.id)
         VStack(alignment: .leading, spacing: 16) {
-            VStack(alignment: .leading, spacing: 2) {
-                Text(station.name).font(.title3.bold())
-                if let here {
-                    Text(Measurement(value: station.distance(from: here), unit: UnitLength.meters),
-                         format: .measurement(width: .abbreviated, usage: .road))
-                        .font(.subheadline).foregroundStyle(.secondary)
+            HStack(alignment: .top) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(station.name).font(.title3.bold())
+                    if let here {
+                        Text(Measurement(value: station.distance(from: here), unit: UnitLength.meters),
+                             format: .measurement(width: .abbreviated, usage: .road))
+                            .font(.subheadline).foregroundStyle(.secondary)
+                    }
                 }
+                Spacer()
+                Button(action: onClose) {
+                    Image(systemName: "xmark.circle.fill")
+                        .font(.title2)
+                        .symbolRenderingMode(.hierarchical)
+                        .foregroundStyle(.secondary)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Close")
             }
 
             HStack {
@@ -49,6 +61,7 @@ struct StationDetailView: View {
             .controlSize(.large)
         }
         .padding()
+        .padding(.top, 8)
         .frame(maxHeight: .infinity, alignment: .top)
     }
 

@@ -8,10 +8,10 @@ near a destination, or at your favorite stations.
   Rectangular shows up to three dots — open docks inside, short street name below
   ("W 72 St & Amsterdam Ave" → "72nd").
 - **App**: asks for location on first launch (which also unlocks location for the widget).
-  The main screen is a map of stations (pins show open docks) above a nearby list;
-  tap a pin or row for live counts, a favorite button, and cycling directions.
-  A filter hides full stations. **Destinations** (Work, Home…)
-  show docks near a place before you get there — in the app and as a widget mode.
+  The main screen is a full-screen map (pins show open docks) under a draggable sheet
+  with search, chips, and the nearby list; tap a pin or row for live counts, a favorite
+  button, and cycling directions. The *Open docks* chip hides full stations. Saved places
+  (Work, Home…) appear as chips and show docks near there — in the app and as a widget mode.
 - **Siri / Shortcuts**: "How many docks at *station* in DockNearby",
   "Docks near *destination* in DockNearby".
 
@@ -23,7 +23,7 @@ Data: Citi Bike's public [GBFS 1.1 feed](https://gbfs.lyft.com/gbfs/1.1/bkn/gbfs
 | --- | --- |
 | `project.yml` | XcodeGen spec — **source of truth** for the Xcode project |
 | `BikeKit/` | Local Swift package: GBFS models, `GBFSClient`, `SharedStore` (App Group) |
-| `DockNearby/` | iOS app: onboarding, map + nearby list, station sheet, favorites |
+| `DockNearby/` | iOS app: onboarding, map (`HomeView`) + draggable sheet (`StationsSheet`), shared `HomeModel` |
 | `DockWidget/` | Widget extension: timeline provider, intents, views, `LocationFetcher` |
 | `Shared/` | Source compiled into both app and widget (`DestinationEntity`) |
 

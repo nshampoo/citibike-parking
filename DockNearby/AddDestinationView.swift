@@ -2,45 +2,6 @@ import SwiftUI
 import MapKit
 import BikeKit
 
-/// Saved destinations: tap one to see docks near it, swipe to delete, + to add.
-struct DestinationsView: View {
-    let onPick: (Destination) -> Void
-    @Environment(DestinationsStore.self) private var destinations
-    @Environment(\.dismiss) private var dismiss
-
-    var body: some View {
-        NavigationStack {
-            List {
-                ForEach(destinations.all) { d in
-                    Button {
-                        onPick(d)
-                        dismiss()
-                    } label: {
-                        Label(d.name, systemImage: "flag.fill")
-                    }
-                    .tint(.primary)
-                }
-                .onDelete { destinations.remove(atOffsets: $0) }
-            }
-            .overlay {
-                if destinations.all.isEmpty {
-                    ContentUnavailableView("No Destinations", systemImage: "flag",
-                                           description: Text("Add places like Work or Home to see open docks there before you arrive."))
-                }
-            }
-            .navigationTitle("Destinations")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) { Button("Done") { dismiss() } }
-                ToolbarItem(placement: .primaryAction) {
-                    NavigationLink { AddDestinationView() } label: { Image(systemName: "plus") }
-                        .accessibilityLabel("Add destination")
-                }
-            }
-        }
-    }
-}
-
 /// Address/place search; picking a result asks for a name ("Work"), then saves it.
 struct AddDestinationView: View {
     @Environment(DestinationsStore.self) private var destinations
@@ -71,7 +32,11 @@ struct AddDestinationView: View {
             }
             .tint(.primary)
         }
-        .navigationTitle("Add Destination")
+        .navigationTitle("Add Place")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
+        }
         .searchable(text: $query, placement: .navigationBarDrawer(displayMode: .always), prompt: "Address or place")
         .task(id: query) { await search() }
         .alert("Name this destination", isPresented: .init(get: { picked != nil }, set: { if !$0 { picked = nil } })) {

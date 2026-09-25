@@ -15,8 +15,8 @@ final class DestinationsStore {
         save()
     }
 
-    func remove(atOffsets offsets: IndexSet) {
-        all.remove(atOffsets: offsets)
+    func remove(_ id: Destination.ID) {
+        all.removeAll { $0.id == id }
         save()
     }
 

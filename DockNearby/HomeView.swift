@@ -2,83 +2,48 @@ import SwiftUI
 import MapKit
 import BikeKit
 
-/// Map on top, nearby list below. Tapping a pin or a row opens the station sheet.
+/// Full-screen map with a draggable station sheet floating over it, Apple Maps style.
 struct HomeView: View {
     @Environment(LocationModel.self) private var location
     @Environment(FavoritesStore.self) private var favorites
-    @Environment(\.openURL) private var openURL
     @Environment(\.scenePhase) private var scenePhase
-
-    @State private var stations: [NearbyStation] = []
-    @State private var loadError: String?
-    @State private var query = ""
-    @State private var selectedID: String?
-    @State private var camera = Self.followUser
-    @State private var visibleRegion: MKCoordinateRegion?
-    /// When set, the list shows docks near this place instead of near you.
-    @State private var destination: Destination?
-    @State private var showingDestinations = false
-    /// Per-device preference, so plain UserDefaults (not the App Group) is enough.
     @AppStorage("onlyWithRoom") private var onlyWithRoom = false
+
+    @State private var model = HomeModel()
 
     /// SwiftUI maps slow down with thousands of annotations, so draw at most this many.
     private static let maxPins = 150
-    private static let nearbyCount = 30
-    private static let followUser = MapCameraPosition.userLocation(
-        fallback: .region(MKCoordinateRegion(center: SharedStore.fallbackLocation.coordinate,
-                                             latitudinalMeters: 1_500, longitudinalMeters: 1_500)))
 
     var body: some View {
-        NavigationStack {
-            VStack(spacing: 0) {
-                map.containerRelativeFrame(.vertical) { height, _ in height * 0.45 }
-                list
+        map
+            // Always on screen; drag it between peek, half, and full height.
+            .sheet(isPresented: .constant(true)) {
+                StationsSheet(model: model)
+                    .presentationDetents([HomeModel.peek, HomeModel.half, .large], selection: $model.detent)
+                    // Keep the map usable below full height, so you can pan and tap pins.
+                    .presentationBackgroundInteraction(.enabled(upThrough: HomeModel.half))
+                    .presentationDragIndicator(.visible)
+                    .interactiveDismissDisabled()
+                    .translucentSheetBackground()
             }
-            .navigationTitle("DockNearby")
-            .navigationBarTitleDisplayMode(.inline)
-            .searchable(text: $query, prompt: "Search stations")
-            .toolbar {
-                ToolbarItem(placement: .topBarLeading) { roomFilterButton }
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        selectedID = nil   // close the station sheet first; one sheet at a time
-                        showingDestinations = true
-                    } label: {
-                        Image(systemName: destination == nil ? "flag" : "flag.fill")
-                    }
-                    .accessibilityLabel("Destinations")
-                }
-            }
-            .sheet(item: selection) { station in
-                StationDetailView(station: station, here: location.location)
-                    .presentationDetents([.height(250)])
-                    // Keep the map usable while the sheet is up, so you can tap another pin.
-                    .presentationBackgroundInteraction(.enabled(upThrough: .height(250)))
-            }
-            .task { await load() }
+            .task { await model.load(near: location.location) }
             .onChange(of: scenePhase) { _, phase in
-                if phase == .active { Task { await load() } }
+                if phase == .active { Task { await model.load(near: location.location) } }
             }
-        }
-        .sheet(isPresented: $showingDestinations) {
-            DestinationsView { show($0) }
-        }
     }
 
-    // MARK: Map
-
     private var map: some View {
-        Map(position: $camera) {
+        Map(position: $model.camera) {
             UserAnnotation()
-            if let destination {
-                Marker(destination.name, systemImage: "flag.fill", coordinate: destination.coordinate)
+            if let destination = model.destination {
+                Marker(destination.name, systemImage: "mappin", coordinate: destination.coordinate)
                     .tint(.purple)
             }
             ForEach(pins) { s in
                 Annotation(s.name, coordinate: s.coordinate) {
-                    StationPin(docks: s.docks, isFavorite: favorites.contains(s.id), isSelected: s.id == selectedID,
-                               isDimmed: onlyWithRoom && !s.hasRoom)
-                        .onTapGesture { selectedID = s.id }
+                    StationPin(docks: s.docks, isFavorite: favorites.contains(s.id),
+                               isSelected: s.id == model.selectedID, isDimmed: onlyWithRoom && !s.hasRoom)
+                        .onTapGesture { model.select(s, moveMap: false) }
                 }
                 .annotationTitles(.hidden)
             }
@@ -87,13 +52,13 @@ struct HomeView: View {
             MapUserLocationButton()
             MapCompass()
         }
-        .onMapCameraChange(frequency: .onEnd) { visibleRegion = $0.region }
+        .onMapCameraChange(frequency: .onEnd) { model.visibleRegion = $0.region }
     }
 
     /// Stations inside the visible region; if there are too many, the ones nearest its center.
     private var pins: [NearbyStation] {
-        guard let r = visibleRegion else { return [] }
-        let inView = stations.filter {
+        guard let r = model.visibleRegion else { return [] }
+        let inView = model.stations.filter {
             abs($0.latitude - r.center.latitude) <= r.span.latitudeDelta / 2
                 && abs($0.longitude - r.center.longitude) <= r.span.longitudeDelta / 2
         }
@@ -101,171 +66,15 @@ struct HomeView: View {
         let center = CLLocation(latitude: r.center.latitude, longitude: r.center.longitude)
         return Array(inView.sorted { $0.distance(from: center) < $1.distance(from: center) }.prefix(Self.maxPins))
     }
-
-    // MARK: List
-
-    private var list: some View {
-        // Distance from the destination or the user when known; alphabetical otherwise.
-        let here = destination?.location ?? location.location
-        let sorted = here.map { h in stations.sorted { $0.distance(from: h) < $1.distance(from: h) } }
-            ?? stations.sorted { $0.name.localizedStandardCompare($1.name) == .orderedAscending }
-        let matches = query.isEmpty ? sorted : sorted.filter { $0.name.localizedStandardContains(query) }
-        let favs = matches.filter { favorites.contains($0.id) }
-        // Favorites always show; the room filter only trims the rest.
-        let others = matches.filter { !favorites.contains($0.id) && (!onlyWithRoom || $0.hasRoom) }
-
-        return List {
-            if let destination {
-                destinationBanner(destination)
-            } else if !location.isAuthorized {
-                permissionBanner
-            }
-            if !favs.isEmpty {
-                Section("Favorites") { ForEach(favs) { row($0, here: here) } }
-            }
-            Section(sectionTitle(hasLocation: here != nil)) {
-                // Without a search, only the closest few — the map covers the rest.
-                ForEach(query.isEmpty ? Array(others.prefix(Self.nearbyCount)) : others) { row($0, here: here) }
-            }
-        }
-        .listStyle(.plain)
-        .overlay { overlay(isEmpty: matches.isEmpty) }
-        .refreshable {
-            location.refresh()
-            await load()
-        }
-    }
-
-    private func row(_ s: NearbyStation, here: CLLocation?) -> some View {
-        Button { select(s) } label: {
-            HStack {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(s.name)
-                    if let here {
-                        Text(Measurement(value: s.distance(from: here), unit: UnitLength.meters),
-                             format: .measurement(width: .abbreviated, usage: .road))
-                            .font(.caption).foregroundStyle(.secondary)
-                    }
-                }
-                Spacer()
-                Text("\(s.docks)").font(.headline).foregroundStyle(dockColor(s.docks))
-                Text("docks").font(.caption).foregroundStyle(.secondary)
-            }
-        }
-        .tint(.primary)
-    }
-
-    /// From the list: open the sheet and bring the station into view on the map.
-    private func select(_ s: NearbyStation) {
-        selectedID = s.id
-        withAnimation {
-            camera = .region(MKCoordinateRegion(center: s.coordinate, latitudinalMeters: 800, longitudinalMeters: 800))
-        }
-    }
-
-    /// From the destinations sheet: center on the place and list docks around it.
-    private func show(_ d: Destination) {
-        destination = d
-        withAnimation {
-            camera = .region(MKCoordinateRegion(center: d.coordinate, latitudinalMeters: 1_000, longitudinalMeters: 1_000))
-        }
-    }
-
-    private func clearDestination() {
-        destination = nil
-        withAnimation { camera = Self.followUser }
-    }
-
-    private func sectionTitle(hasLocation: Bool) -> String {
-        if !query.isEmpty { return "Results" }
-        if let destination { return "Near \(destination.name)" }
-        return hasLocation ? "Nearby" : "Stations"
-    }
-
-    private var selection: Binding<NearbyStation?> {
-        Binding(get: { stations.first { $0.id == selectedID } },
-                set: { selectedID = $0?.id })
-    }
-
-    // MARK: Data
-
-    private func load() async {
-        do {
-            stations = try await GBFSClient.shared.stations(near: location.location ?? SharedStore.fallbackLocation)
-            loadError = nil
-        } catch {
-            loadError = "Couldn't load stations. Pull to retry."
-        }
-    }
-
-    // MARK: Views
-
-    private var roomFilterButton: some View {
-        Button { onlyWithRoom.toggle() } label: {
-            Image(systemName: onlyWithRoom ? "line.3.horizontal.decrease.circle.fill" : "line.3.horizontal.decrease.circle")
-        }
-        .accessibilityLabel(onlyWithRoom ? "Show all stations" : "Only stations with room")
-    }
-
-    private func destinationBanner(_ d: Destination) -> some View {
-        HStack {
-            Label("Docks near \(d.name)", systemImage: "flag.fill").foregroundStyle(.purple)
-            Spacer()
-            Button("Back to me", action: clearDestination).font(.subheadline)
-        }
-    }
-
-    private var permissionBanner: some View {
-        Section {
-            Label("Location is off, so the widget uses your last known spot.", systemImage: "location.slash")
-            Button("Open Settings") {
-                if let url = URL(string: UIApplication.openSettingsURLString) { openURL(url) }
-            }
-        }
-    }
-
-    @ViewBuilder private func overlay(isEmpty: Bool) -> some View {
-        if stations.isEmpty {
-            if let loadError {
-                ContentUnavailableView("No Connection", systemImage: "wifi.slash", description: Text(loadError))
-            } else {
-                ProgressView()
-            }
-        } else if isEmpty {
-            ContentUnavailableView.search(text: query)
-        }
-    }
 }
 
-/// Green plenty, orange few, red none — same scale as the home screen widget.
-func dockColor(_ docks: Int) -> Color { docks == 0 ? .red : docks <= 3 ? .orange : .green }
-
-/// A map pin: a dot showing the open-dock count, with a star badge for favorites.
-struct StationPin: View {
-    let docks: Int
-    let isFavorite: Bool
-    let isSelected: Bool
-    var isDimmed = false
-
-    var body: some View {
-        Text("\(docks)")
-            .font(.caption.bold())
-            .foregroundStyle(.white)
-            .frame(width: 26, height: 26)
-            .background(dockColor(docks), in: .circle)
-            .overlay(Circle().stroke(.white, lineWidth: 2))
-            .overlay(alignment: .topTrailing) {
-                if isFavorite {
-                    Image(systemName: "star.fill")
-                        .font(.system(size: 10))
-                        .foregroundStyle(.yellow)
-                        .shadow(radius: 1)
-                        .offset(x: 5, y: -5)
-                }
-            }
-            .opacity(isDimmed ? 0.35 : 1)
-            .scaleEffect(isSelected ? 1.35 : 1)
-            .animation(.snappy, value: isSelected)
-            .shadow(radius: 2)
+private extension View {
+    /// iOS 26 gives partial-height sheets Liquid Glass on its own; earlier versions get a material.
+    @ViewBuilder func translucentSheetBackground() -> some View {
+        if #available(iOS 26, *) {
+            self
+        } else {
+            presentationBackground(.regularMaterial)
+        }
     }
 }
