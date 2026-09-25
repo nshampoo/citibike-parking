@@ -19,7 +19,7 @@ enum CountKind: String, AppEnum {
 
     static var typeDisplayRepresentation: TypeDisplayRepresentation { "Count" }
     static var caseDisplayRepresentations: [CountKind: DisplayRepresentation] {
-        [.docks: "Open docks", .bikes: "Any bike", .ebikes: "E-bikes", .classic: "Classic bikes"]
+        [.docks: "Parking", .bikes: "Any bike", .ebikes: "E-bikes", .classic: "Classic bikes"]
     }
 
     var need: Need {

@@ -58,8 +58,8 @@ struct RectangularView: View {
     /// shrink to their content, so a frame inside the label wouldn't push it over.
     private var refreshRow: some View {
         HStack(spacing: 0) {
-            // What the dots count, e.g. "E-BIKES".
-            Text(entry.need.noun(for: 2).uppercased())
+            // What the dots count: "PARKING", "BIKES", "E-BIKES"…
+            Text(entry.need == .dock ? "PARKING" : entry.need.noun(for: 2).uppercased())
                 .font(.caption2.weight(.semibold))
                 .foregroundStyle(.secondary)
             Spacer(minLength: 0)
