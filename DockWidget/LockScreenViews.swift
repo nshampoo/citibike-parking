@@ -16,32 +16,63 @@ private func statusText(_ entry: DockEntry) -> String? {
     }
 }
 
-/// Up to three dots side by side: open docks inside, short street name below.
+/// A "↻ 5 min ago" row over up to three dots: open docks inside, short street name below.
+/// Tapping the top row refreshes.
 struct RectangularView: View {
     let entry: DockEntry
 
     var body: some View {
-        if entry.stations.isEmpty {
-            Label(statusText(entry) ?? "", systemImage: "bicycle")
-                .font(.caption)
-        } else {
-            HStack(spacing: 4) {
-                ForEach(entry.stations) { s in
-                    VStack(spacing: 2) {
-                        Text("\(s.docks)")
-                            .font(.title3.bold())
-                            .minimumScaleFactor(0.6)
-                            .frame(width: 36, height: 36)
-                            .background { AccessoryWidgetBackground().clipShape(.circle) }
-                            .widgetAccentable()
-                        Text(s.shortName)
-                            .font(.caption2.weight(.semibold))
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.6)
+        VStack(spacing: 2) {
+            refreshRow
+            if entry.stations.isEmpty {
+                Label(statusText(entry) ?? "", systemImage: "bicycle")
+                    .font(.caption)
+                    .frame(maxHeight: .infinity)
+            } else {
+                HStack(spacing: 4) {
+                    ForEach(entry.stations) { s in
+                        VStack(spacing: 1) {
+                            Text("\(s.docks)")
+                                .font(.headline)
+                                .minimumScaleFactor(0.6)
+                                .frame(width: 30, height: 30)
+                                .background { AccessoryWidgetBackground().clipShape(.circle) }
+                                .widgetAccentable()
+                            Text(s.shortName)
+                                .font(.caption2.weight(.semibold))
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.6)
+                        }
+                        .frame(maxWidth: .infinity)
                     }
-                    .frame(maxWidth: .infinity)
                 }
             }
+        }
+    }
+
+    private var refreshRow: some View {
+        Button(intent: RefreshIntent()) {
+            HStack(spacing: 3) {
+                Image(systemName: "arrow.clockwise")
+                DataAge(date: entry.date)
+            }
+            .font(.caption2)
+            .frame(maxWidth: .infinity, alignment: .trailing)
+        }
+        .buttonStyle(.plain)
+    }
+}
+
+/// How old the counts are. iOS 18+ counts up live ("5 min ago") without spending
+/// widget reloads; iOS 17's live relative text is too wordy, so it shows the fetch time.
+private struct DataAge: View {
+    let date: Date
+
+    var body: some View {
+        if #available(iOS 18, *) {
+            Text(.currentDate, format: .reference(to: date, allowedFields: [.hour, .minute], maxFieldCount: 1))
+        } else {
+            Text(date, style: .time)
         }
     }
 }

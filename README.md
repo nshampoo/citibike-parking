@@ -7,7 +7,8 @@ near a destination, or at your favorite stations.
   *My favorites*, *Near a destination*, or *Commute* — near Work 4am–noon, Home otherwise,
   once both are set (long-press → Customize → tap the widget).
   Rectangular shows up to three dots — open docks inside, short street name below
-  ("W 72 St & Amsterdam Ave" → "72nd").
+  ("W 72 St & Amsterdam Ave" → "72nd") — under a "↻ 5 min ago" row: tap it to refresh
+  (an interactive `AppIntent` button; runs once the phone is unlocked).
 - **App**: asks for location on first launch (which also unlocks location for the widget).
   The main screen is a full-screen map (pins show open docks) under a draggable sheet
   with search, chips, and the nearby list; tap a pin or row for live counts, a favorite
@@ -70,7 +71,7 @@ cd BikeKit && LIVE_GBFS=1 swift test
 - **iCloud Drive + codesign:** this repo lives in an iCloud-synced folder. Keep build output in
   the default `~/Library/Developer/Xcode/DerivedData` — building *inside* the repo fails with
   "resource fork, Finder information, or similar detritus not allowed".
-- Widgets reload about every 15 minutes at best.
+- Widgets reload about every 15 minutes at best (iOS rations reloads); the ↻ button forces one.
 - No location in the widget? Check the app has permission. The widget falls back to the last
   location the app saw, then to 71st & Amsterdam.
 - Widget extensions have a ~30 MB memory limit; BikeKit caches only the station fields it uses.

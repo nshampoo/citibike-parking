@@ -42,3 +42,12 @@ struct DockConfig: WidgetConfigurationIntent {
         }
     }
 }
+
+/// The refresh button on the rectangular widget. perform() has nothing to do:
+/// WidgetKit reloads the timeline after any Button(intent:) runs, which refetches.
+struct RefreshIntent: AppIntent {
+    static var title: LocalizedStringResource { "Refresh Citi Bike" }
+    static var isDiscoverable: Bool { false }   // widget-only; hide from Shortcuts
+
+    func perform() async throws -> some IntentResult { .result() }
+}
