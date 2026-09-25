@@ -16,7 +16,7 @@ private func statusText(_ entry: DockEntry) -> String? {
     }
 }
 
-/// A "↻ 5 min ago" row over up to three dots: open docks inside, short street name below.
+/// A "↻ 5 min ago" row (right-aligned) over up to three dots: open docks inside, short street name below.
 /// Tapping the top row refreshes.
 struct RectangularView: View {
     let entry: DockEntry
@@ -48,8 +48,8 @@ struct RectangularView: View {
     private var refreshRow: some View {
         Button(intent: RefreshIntent()) {
             HStack(spacing: 4) {
+                Image(systemName: "arrow.clockwise").font(.system(size: 20))
                 DataAge(date: entry.date).font(.caption2)
-                Image(systemName: "arrow.clockwise").font(.system(size: 20, weight: .semibold))
             }
             .foregroundStyle(.secondary)
             .frame(maxWidth: .infinity, alignment: .trailing)
