@@ -27,7 +27,7 @@ targets:
   DockNearby:
     type: application
     platform: iOS
-    sources: [DockNearby]
+    sources: [DockNearby, Shared]
     dependencies:
       - package: BikeKit
       - target: DockWidget          # embeds the widget extension in the app
@@ -52,7 +52,7 @@ targets:
   DockWidget:
     type: app-extension
     platform: iOS
-    sources: [DockWidget]
+    sources: [DockWidget, Shared]
     dependencies:
       - package: BikeKit
       - sdk: WidgetKit.framework

@@ -1,12 +1,15 @@
 import WidgetKit
+import CoreLocation
 import BikeKit
 
 struct DockEntry: TimelineEntry {
-    enum State { case loaded, failed, noFavorites }
+    enum State { case loaded, failed, noFavorites, noDestination }
 
     let date: Date
     let stations: [NearbyStation]
     let state: State
+    /// Set in destination mode, e.g. "Work" — shown in the home screen header.
+    var placeName: String? = nil
 
     static let sample = DockEntry(date: .now, stations: [
         NearbyStation(id: "1", name: "W 70 St & Amsterdam Ave", meters: 100, docks: 7, classic: 4, ebikes: 3, renting: true, capacity: 20,
@@ -40,17 +43,30 @@ struct Provider: AppIntentTimelineProvider {
         default: 3
         }
         let favorites = SharedStore.favorites
-        if config.mode == .favorites && favorites.isEmpty {
+        let here: CLLocation
+        let placeName: String?
+        switch config.mode {
+        case .favorites where favorites.isEmpty:
             return DockEntry(date: .now, stations: [], state: .noFavorites)
+        case .destination:
+            // Look it up fresh: the name or the destination itself may have changed in the app.
+            guard let id = config.destination?.id,
+                  let destination = SharedStore.destinations.first(where: { $0.id == id }) else {
+                return DockEntry(date: .now, stations: [], state: .noDestination)
+            }
+            here = destination.location
+            placeName = destination.name
+        case .closest, .favorites:
+            here = await LocationFetcher.current()
+            placeName = nil
         }
-        let here = await LocationFetcher.current()
         do {
             let stations = try await GBFSClient.shared.nearest(
                 to: here, count: count, only: config.mode == .favorites ? favorites : nil,
                 needsRoom: config.needsRoom)
-            return DockEntry(date: .now, stations: stations, state: .loaded)
+            return DockEntry(date: .now, stations: stations, state: .loaded, placeName: placeName)
         } catch {
-            return DockEntry(date: .now, stations: [], state: .failed)
+            return DockEntry(date: .now, stations: [], state: .failed, placeName: placeName)
         }
     }
 }

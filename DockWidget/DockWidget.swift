@@ -28,7 +28,7 @@ struct HomeScreenView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
             HStack {
-                Text("Citi Bike").font(.caption.bold())
+                Text(entry.placeName.map { "Near \($0)" } ?? "Citi Bike").font(.caption.bold()).lineLimit(1)
                 Spacer()
                 Text(entry.date, style: .time).font(.caption2).foregroundStyle(.secondary)
                 Button(intent: RefreshIntent()) {
@@ -42,6 +42,8 @@ struct HomeScreenView: View {
                 message("Couldn't load")
             case .noFavorites:
                 message("Star stations in the app")
+            case .noDestination:
+                message("Pick a destination in Edit Widget")
             case .loaded where entry.stations.isEmpty:
                 message("No stations found")
             case .loaded:
