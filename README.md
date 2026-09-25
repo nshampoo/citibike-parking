@@ -1,4 +1,6 @@
-# DockNearby
+# Park It
+
+(Code name **DockNearby** — targets, bundle IDs, and the repo keep that name.)
 
 A SwiftUI app + Lock Screen widget that shows open Citi Bike docks near you,
 near a destination, or at your favorite stations.
@@ -14,8 +16,8 @@ near a destination, or at your favorite stations.
   with search, chips, and the nearby list; tap a pin or row for live counts, a favorite
   button, and cycling directions. The *Open docks* chip hides full stations. Home, Work,
   and other saved places appear as chips and show docks near there — in the app and as a widget mode.
-- **Siri / Shortcuts**: "How many docks at *station* in DockNearby",
-  "Docks near *destination* in DockNearby".
+- **Siri / Shortcuts**: "How many docks at *station* in Park It",
+  "Docks near *destination* in Park It".
 
 Data: Citi Bike's public [GBFS 1.1 feed](https://gbfs.lyft.com/gbfs/1.1/bkn/gbfs.json) — no API key.
 

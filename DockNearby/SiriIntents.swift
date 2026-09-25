@@ -1,8 +1,8 @@
 import AppIntents
 import BikeKit
 
-// "Hey Siri, how many docks at <station> in DockNearby" and
-// "Docks near <destination> in DockNearby". Also available in the Shortcuts app.
+// "Hey Siri, how many docks at <station> in Park It" and
+// "Docks near <destination> in Park It" (the app name comes from .applicationName). Also available in the Shortcuts app.
 
 /// A Citi Bike station as App Intents sees it.
 struct StationEntity: AppEntity {
@@ -61,7 +61,7 @@ struct DocksNearDestinationIntent: AppIntent {
 
     func perform() async throws -> some IntentResult & ProvidesDialog {
         guard let place = SharedStore.destinations.first(where: { $0.id == destination.id }) else {
-            return .result(dialog: "I couldn't find that destination. Add it again in DockNearby.")
+            return .result(dialog: "I couldn't find that destination. Add it again in Park It.")
         }
         let stations = try await GBFSClient.shared.nearest(to: place.location, count: 3)
         let summary = stations.map { "\($0.shortName) has \($0.docks)" }.joined(separator: ", ")

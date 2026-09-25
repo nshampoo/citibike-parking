@@ -1,6 +1,6 @@
 # DockNearby
 
-SwiftUI iOS 17+ app + WidgetKit extension showing open Citi Bike docks nearby. See README.md for layout and setup.
+SwiftUI iOS 17+ app + WidgetKit extension showing open Citi Bike docks nearby. Shown to users as **Park It** (`CFBundleDisplayName`); code, targets, and bundle IDs stay DockNearby. See README.md for layout and setup.
 
 ## Rules
 - `project.yml` (XcodeGen) is the source of truth. The `.xcodeproj`, Info.plists and entitlements are generated and gitignored — edit the YAML, then `xcodegen generate`.

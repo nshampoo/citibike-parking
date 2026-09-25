@@ -12,7 +12,7 @@ struct OnboardingView: View {
                 .font(.system(size: 88))
                 .foregroundStyle(.blue)
             Text("Find open docks nearby").font(.title.bold())
-            Text("DockNearby uses your location to show the closest Citi Bike stations — in the app and in the home screen widget.")
+            Text("Park It uses your location to show the closest Citi Bike stations — in the app and on your Lock Screen.")
                 .multilineTextAlignment(.center)
                 .foregroundStyle(.secondary)
             Spacer()

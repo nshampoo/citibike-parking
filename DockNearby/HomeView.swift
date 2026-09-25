@@ -66,7 +66,7 @@ struct HomeView: View {
                 .frame(width: 32, height: 32)
         }
         .glassCircle()
-        .accessibilityLabel("About DockNearby")
+        .accessibilityLabel("About Park It")
     }
 
     /// Stations inside the visible region; if there are too many, the ones nearest its center.

@@ -39,7 +39,7 @@ targets:
     info:
       path: DockNearby/Info.plist
       properties:
-        CFBundleDisplayName: DockNearby
+        CFBundleDisplayName: Park It
         UILaunchScreen: {}
         UISupportedInterfaceOrientations:
           [UIInterfaceOrientationPortrait, UIInterfaceOrientationLandscapeLeft, UIInterfaceOrientationLandscapeRight]
@@ -70,7 +70,7 @@ targets:
     info:
       path: DockWidget/Info.plist
       properties:
-        CFBundleDisplayName: DockNearby
+        CFBundleDisplayName: Park It
         NSWidgetWantsLocation: true
         NSLocationWhenInUseUsageDescription: Find the Citi Bike stations near you
         AppGroupID: $(APP_GROUP_ID)

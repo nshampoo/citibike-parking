@@ -26,19 +26,19 @@ struct AboutView: View {
                     feature("mappin", "Places", "Save Home, Work, or anywhere, and check the docks there before you arrive.")
                     feature("lock.iphone", "Lock Screen widget", "Docks nearby, at your favorites, or near a place — without unlocking.")
                     feature("arrow.triangle.swap", "Commute", "Set Home and Work, and the widget shows docks near Work in the morning and Home after noon.")
-                    feature("mic.fill", "Siri", "“How many docks at … in DockNearby” or “Docks near Work in DockNearby.”")
+                    feature("mic.fill", "Siri", "“How many docks at … in Park It” or “Docks near Work in Park It.”")
                     feature("bicycle", "Directions", "Hand off to Apple Maps for cycling directions to any station.")
                 }
 
                 Section {
-                    Text("Station data comes from Citi Bike's public feed and refreshes every time you open the app. DockNearby isn't affiliated with Citi Bike or Lyft.")
+                    Text("Station data comes from Citi Bike's public feed and refreshes every time you open the app. Park It isn't affiliated with Citi Bike or Lyft.")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                 } footer: {
                     Text("Version \(Self.version)")
                 }
             }
-            .navigationTitle("About DockNearby")
+            .navigationTitle("About Park It")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() } }
