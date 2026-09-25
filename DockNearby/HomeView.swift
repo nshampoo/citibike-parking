@@ -151,7 +151,7 @@ private extension View {
 #if DEBUG
 extension HomeView {
     /// Debug-only launch arguments that stage App Store screenshots without tapping:
-    ///   -screenshotCard    open the first favorite's (or nearest roomy station's) card
+    ///   -screenshotCard    open the first favorite's card (or a nearby station with plenty of docks)
     ///   -screenshotPlaces  save demo Home/Work if missing and show docks near Work
     ///   -screenshotPeek    start with the sheet at its smallest height
     private func applyScreenshotArguments() {

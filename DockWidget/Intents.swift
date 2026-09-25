@@ -47,7 +47,7 @@ struct DockConfig: WidgetConfigurationIntent {
     var counting: CountKind
 
     @Parameter(title: "Hide empty stations", default: false)
-    var needsRoom: Bool
+    var hideEmpty: Bool
 
     // Only ask for a destination when that mode is picked.
     static var parameterSummary: some ParameterSummary {
@@ -56,13 +56,13 @@ struct DockConfig: WidgetConfigurationIntent {
                 \.$mode
                 \.$destination
                 \.$counting
-                \.$needsRoom
+                \.$hideEmpty
             }
         } otherwise: {
             Summary {
                 \.$mode
                 \.$counting
-                \.$needsRoom
+                \.$hideEmpty
             }
         }
     }

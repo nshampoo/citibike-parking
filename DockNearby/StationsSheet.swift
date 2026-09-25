@@ -159,7 +159,7 @@ struct StationsSheet: View {
         let sorted = model.stations.sorted { $0.distance(from: reference) < $1.distance(from: reference) }
         let matches = model.query.isEmpty ? sorted : sorted.filter { $0.name.localizedStandardContains(model.query) }
         let favs = matches.filter { favorites.contains($0.id) }
-        // Favorites always show; the room filter only trims the rest.
+        // Favorites always show; the hide-empty filter only trims the rest.
         let others = matches.filter { !favorites.contains($0.id) && (!hideEmpty || $0.has(need)) }
 
         return List {

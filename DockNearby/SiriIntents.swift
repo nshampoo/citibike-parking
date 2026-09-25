@@ -48,6 +48,6 @@ struct DockNearbyShortcuts: AppShortcutsProvider {
         AppShortcut(intent: DocksNearDestinationIntent(), phrases: [
             "Docks near \(\.$destination) in \(.applicationName)",
             "Check \(.applicationName) docks near \(\.$destination)",
-        ], shortTitle: "Docks Near Destination", systemImageName: "flag")
+        ], shortTitle: "Docks Near Destination", systemImageName: "mappin")
     }
 }

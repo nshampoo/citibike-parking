@@ -75,7 +75,7 @@ struct Provider: AppIntentTimelineProvider {
         do {
             let stations = try await GBFSClient.shared.nearest(
                 to: here, count: count, only: config.mode == .favorites ? favorites : nil,
-                mustHave: config.needsRoom ? need : nil)
+                mustHave: config.hideEmpty ? need : nil)
             return DockEntry(date: .now, stations: stations, state: .loaded, need: need, title: title)
         } catch {
             return DockEntry(date: .now, stations: [], state: .failed, need: need, title: title)

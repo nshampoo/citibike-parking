@@ -18,7 +18,7 @@ final class HomeModel {
     private(set) var loadError: String?
     var query = ""
     var selectedID: String?
-    /// When set, the list shows docks near this place instead of near you.
+    /// When set, the map and list center on this place instead of on you.
     private(set) var destination: Destination?
     var camera = HomeModel.followUser
     var visibleRegion: MKCoordinateRegion?
