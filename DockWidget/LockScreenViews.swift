@@ -32,12 +32,7 @@ struct RectangularView: View {
                 HStack(spacing: 4) {
                     ForEach(entry.stations) { s in
                         VStack(spacing: 1) {
-                            Text("\(s.docks)")
-                                .font(.headline)
-                                .minimumScaleFactor(0.6)
-                                .frame(width: 30, height: 30)
-                                .background { AccessoryWidgetBackground().clipShape(.circle) }
-                                .widgetAccentable()
+                            DockDot(docks: s.docks)
                             Text(s.shortName)
                                 .font(.caption2.weight(.semibold))
                                 .lineLimit(1)
@@ -52,14 +47,33 @@ struct RectangularView: View {
 
     private var refreshRow: some View {
         Button(intent: RefreshIntent()) {
-            HStack(spacing: 3) {
-                Image(systemName: "arrow.clockwise")
-                DataAge(date: entry.date)
+            HStack(spacing: 4) {
+                DataAge(date: entry.date).font(.caption2)
+                Image(systemName: "arrow.clockwise").font(.system(size: 20, weight: .semibold))
             }
-            .font(.caption2)
+            .foregroundStyle(.secondary)
             .frame(maxWidth: .infinity, alignment: .trailing)
         }
         .buttonStyle(.plain)
+    }
+}
+
+/// A solid light circle with the dock count cut out of it. Lock Screen widgets
+/// render in one tint, so "dark text on light" means letting the wallpaper show through.
+private struct DockDot: View {
+    let docks: Int
+
+    var body: some View {
+        ZStack {
+            Circle()
+            Text("\(docks)")
+                .font(.headline.weight(.heavy))
+                .minimumScaleFactor(0.6)
+                .blendMode(.destinationOut)
+        }
+        .compositingGroup()
+        .frame(width: 30, height: 30)
+        .widgetAccentable()
     }
 }
 
