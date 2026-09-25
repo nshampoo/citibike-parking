@@ -1,34 +1,53 @@
 import SwiftUI
 
-/// Green plenty, orange few, red none.
-func dockColor(_ docks: Int) -> Color { docks == 0 ? .red : docks <= 3 ? .orange : .green }
+/// Plenty, few, none — softer than the system traffic-light colors so pins don't shout.
+func dockColor(_ docks: Int) -> Color {
+    switch docks {
+    case 0: Color(red: 0.86, green: 0.30, blue: 0.31)       // muted red
+    case 1...3: Color(red: 0.93, green: 0.62, blue: 0.20)   // amber
+    default: Color(red: 0.20, green: 0.64, blue: 0.44)      // deep green
+    }
+}
 
-/// A map pin: a dot showing the open-dock count, with a star badge for favorites.
+/// A map pin: a white dot ringed in the availability color with the dock count inside,
+/// or just a small colored dot when zoomed out, where numbers would be noise.
 struct StationPin: View {
     let docks: Int
     let isFavorite: Bool
     let isSelected: Bool
     var isDimmed = false
+    var isCompact = false
 
     var body: some View {
-        Text("\(docks)")
-            .font(.caption.bold())
-            .foregroundStyle(.white)
-            .frame(width: 26, height: 26)
-            .background(dockColor(docks), in: .circle)
-            .overlay(Circle().stroke(.white, lineWidth: 2))
-            .overlay(alignment: .topTrailing) {
-                if isFavorite {
-                    Image(systemName: "star.fill")
-                        .font(.system(size: 10))
-                        .foregroundStyle(.yellow)
-                        .shadow(radius: 1)
-                        .offset(x: 5, y: -5)
-                }
+        Group {
+            if isCompact {
+                Circle()
+                    .fill(dockColor(docks))
+                    .frame(width: 11, height: 11)
+                    .overlay(Circle().stroke(.background, lineWidth: 1.5))
+            } else {
+                Text("\(docks)")
+                    .font(.system(size: 13, weight: .semibold, design: .rounded))
+                    .monospacedDigit()
+                    .foregroundStyle(.primary)
+                    .frame(width: 28, height: 28)
+                    .background(.background, in: .circle)
+                    .overlay(Circle().strokeBorder(dockColor(docks), lineWidth: 3))
+                    .overlay(alignment: .topTrailing) {
+                        if isFavorite {
+                            Image(systemName: "star.fill")
+                                .font(.system(size: 8, weight: .bold))
+                                .foregroundStyle(.white)
+                                .padding(3)
+                                .background(.yellow, in: .circle)
+                                .offset(x: 6, y: -6)
+                        }
+                    }
             }
-            .opacity(isDimmed ? 0.35 : 1)
-            .scaleEffect(isSelected ? 1.35 : 1)
-            .animation(.snappy, value: isSelected)
-            .shadow(radius: 2)
+        }
+        .shadow(color: .black.opacity(0.18), radius: 2, y: 1)
+        .opacity(isDimmed ? 0.35 : 1)
+        .scaleEffect(isSelected ? 1.3 : 1)
+        .animation(.snappy, value: isSelected)
     }
 }

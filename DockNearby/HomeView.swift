@@ -13,6 +13,8 @@ struct HomeView: View {
 
     /// SwiftUI maps slow down with thousands of annotations, so draw at most this many.
     private static let maxPins = 150
+    /// Zoomed out past ~3 km of latitude, pins drop their numbers and become dots.
+    private static let numbersBelowSpan = 0.03
 
     var body: some View {
         map
@@ -39,15 +41,18 @@ struct HomeView: View {
                 Marker(destination.name, systemImage: "mappin", coordinate: destination.coordinate)
                     .tint(.purple)
             }
+            let compact = (model.visibleRegion?.span.latitudeDelta ?? 0) > Self.numbersBelowSpan
             ForEach(pins) { s in
                 Annotation(s.name, coordinate: s.coordinate) {
                     StationPin(docks: s.docks, isFavorite: favorites.contains(s.id),
-                               isSelected: s.id == model.selectedID, isDimmed: onlyWithRoom && !s.hasRoom)
+                               isSelected: s.id == model.selectedID, isDimmed: onlyWithRoom && !s.hasRoom,
+                               isCompact: compact && s.id != model.selectedID)
                         .onTapGesture { model.select(s, moveMap: false) }
                 }
                 .annotationTitles(.hidden)
             }
         }
+        .mapStyle(.standard(emphasis: .muted, pointsOfInterest: .excludingAll))
         .mapControls {
             MapUserLocationButton()
             MapCompass()
