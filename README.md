@@ -3,7 +3,7 @@
 A SwiftUI app + home screen widget that shows open Citi Bike docks near you,
 with classic/e-bike counts and a tap-to-refresh button.
 
-- **Widget** (medium / large): each widget can show *Closest to me* or *My favorites*
+- **Widget** (home screen: medium / large; Lock Screen: rectangular / circular / inline): each widget can show *Closest to me* or *My favorites*
   (long-press → Edit Widget). Refresh button is an interactive `AppIntent` (iOS 17+).
 - **App**: asks for location on first launch (which also unlocks location for the widget),
   and has a searchable station list where you star favorites.
@@ -66,4 +66,4 @@ cd BikeKit && LIVE_GBFS=1 swift test
 
 ## Ideas
 
-Lock Screen widget · destination mode · tap a row to open Apple Maps · ride Live Activity
+Destination mode · tap a row to open Apple Maps · ride Live Activity

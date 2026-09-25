@@ -2,7 +2,27 @@ import WidgetKit
 import SwiftUI
 import BikeKit
 
+/// Picks the layout for whichever size the user placed.
 struct DockWidgetView: View {
+    let entry: DockEntry
+    @Environment(\.widgetFamily) private var family
+
+    var body: some View {
+        switch family {
+        case .accessoryRectangular:
+            RectangularView(entry: entry).containerBackground(.clear, for: .widget)
+        case .accessoryCircular:
+            CircularView(entry: entry).containerBackground(for: .widget) { AccessoryWidgetBackground() }
+        case .accessoryInline:
+            InlineView(entry: entry).containerBackground(.clear, for: .widget)
+        default:
+            HomeScreenView(entry: entry)
+        }
+    }
+}
+
+/// Medium / large: header with refresh button, then one row per station.
+struct HomeScreenView: View {
     let entry: DockEntry
 
     var body: some View {
@@ -60,7 +80,10 @@ struct DockWidget: Widget {
         }
         .configurationDisplayName("Citi Bike Docks")
         .description("Open docks and bikes at nearby or favorite stations.")
-        .supportedFamilies([.systemMedium, .systemLarge])
+        .supportedFamilies([
+            .systemMedium, .systemLarge,
+            .accessoryRectangular, .accessoryCircular, .accessoryInline,   // Lock Screen
+        ])
     }
 }
 
@@ -70,3 +93,7 @@ struct DockWidget: Widget {
     DockEntry.sample
     DockEntry(date: .now, stations: [], state: .noFavorites)
 }
+
+#Preview(as: .accessoryRectangular) { DockWidget() } timeline: { DockEntry.sample }
+#Preview(as: .accessoryCircular) { DockWidget() } timeline: { DockEntry.sample }
+#Preview(as: .accessoryInline) { DockWidget() } timeline: { DockEntry.sample }

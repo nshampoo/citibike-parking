@@ -9,7 +9,7 @@ struct DockEntry: TimelineEntry {
     let state: State
 
     static let sample = DockEntry(date: .now, stations: [
-        NearbyStation(id: "1", name: "W 70 St & Amsterdam Ave", meters: 100, docks: 7, classic: 4, ebikes: 3, renting: true),
+        NearbyStation(id: "1", name: "W 70 St & Amsterdam Ave", meters: 100, docks: 7, classic: 4, ebikes: 3, renting: true, capacity: 20),
         NearbyStation(id: "2", name: "Amsterdam Ave & W 73 St", meters: 200, docks: 2, classic: 8, ebikes: 5, renting: true),
         NearbyStation(id: "3", name: "Columbus Ave & W 72 St", meters: 280, docks: 0, classic: 10, ebikes: 9, renting: true),
     ], state: .loaded)
@@ -29,7 +29,11 @@ struct Provider: AppIntentTimelineProvider {
     }
 
     private func entry(for config: DockConfig, in context: Context) async -> DockEntry {
-        let count = context.family == .systemLarge ? 6 : 3
+        let count = switch context.family {
+        case .systemLarge: 6
+        case .accessoryRectangular, .accessoryCircular, .accessoryInline: 1   // Lock Screen: closest only
+        default: 3
+        }
         let favorites = SharedStore.favorites
         if config.mode == .favorites && favorites.isEmpty {
             return DockEntry(date: .now, stations: [], state: .noFavorites)
