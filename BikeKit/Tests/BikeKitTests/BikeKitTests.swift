@@ -43,6 +43,14 @@ private func status(_ id: String, bikes: Int = 5, ebikes: Int? = 2, docks: Int =
     #expect(s.ebikes == 2)
 }
 
+@Test func zeroCapacityBecomesNil() {
+    let zero = StationInfo(stationId: "z", name: "Z", lat: 40.78, lon: -73.98, capacity: 0)
+    let result = GBFSClient.merge(info: [zero, info("a", lat: 40.781)], statuses: [status("z"), status("a")],
+                                  here: here, count: 3, only: nil)
+    #expect(result.first { $0.id == "z" }?.capacity == nil)
+    #expect(result.first { $0.id == "a" }?.capacity == 20)
+}
+
 @Test func notReturningMeansZeroDocks() {
     let s = GBFSClient.merge(info: [info("a", lat: 40.78)], statuses: [status("a", docks: 9, returning: 0)],
                              here: here, count: 3, only: nil)[0]

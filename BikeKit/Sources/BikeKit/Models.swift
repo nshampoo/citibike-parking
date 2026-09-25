@@ -37,8 +37,11 @@ public struct NearbyStation: Identifiable, Hashable, Sendable {
     public let classic: Int
     public let ebikes: Int
     public let renting: Bool
+    /// Total docks, when the feed reports a real value (some stations report 0).
+    public let capacity: Int?
 
-    public init(id: String, name: String, meters: Double, docks: Int, classic: Int, ebikes: Int, renting: Bool) {
+    public init(id: String, name: String, meters: Double, docks: Int, classic: Int, ebikes: Int,
+                renting: Bool, capacity: Int? = nil) {
         self.id = id
         self.name = name
         self.meters = meters
@@ -46,6 +49,7 @@ public struct NearbyStation: Identifiable, Hashable, Sendable {
         self.classic = classic
         self.ebikes = ebikes
         self.renting = renting
+        self.capacity = capacity
     }
 }
 

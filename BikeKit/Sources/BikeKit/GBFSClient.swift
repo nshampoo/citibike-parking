@@ -59,7 +59,8 @@ public actor GBFSClient {
                     meters: here.distance(from: CLLocation(latitude: s.lat, longitude: s.lon)),
                     docks: st.isReturning == 1 ? st.numDocksAvailable : 0,
                     classic: max(0, st.numBikesAvailable - e), ebikes: e,
-                    renting: st.isRenting == 1)
+                    renting: st.isRenting == 1,
+                    capacity: (s.capacity ?? 0) > 0 ? s.capacity : nil)
             }
             .sorted { $0.meters < $1.meters }
             .prefix(count)
