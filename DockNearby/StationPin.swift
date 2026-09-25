@@ -24,14 +24,15 @@ struct StationPin: View {
                 Circle()
                     .fill(dockColor(docks))
                     .frame(width: 11, height: 11)
-                    .overlay(Circle().stroke(.background, lineWidth: 1.5))
+                    .overlay(Circle().stroke(Color(uiColor: .tertiarySystemBackground), lineWidth: 1.5))
             } else {
                 Text("\(docks)")
                     .font(.system(size: 13, weight: .semibold, design: .rounded))
                     .monospacedDigit()
                     .foregroundStyle(.primary)
                     .frame(width: 28, height: 28)
-                    .background(.background, in: .circle)
+                    // White in light mode; a raised grey (not black) in dark, so pins sit on the map.
+                    .background(Color(uiColor: .tertiarySystemBackground), in: .circle)
                     .overlay(Circle().strokeBorder(dockColor(docks), lineWidth: 3))
                     .overlay(alignment: .topTrailing) {
                         if isFavorite {

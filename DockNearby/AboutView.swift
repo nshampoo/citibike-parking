@@ -13,7 +13,7 @@ struct AboutView: View {
                             .font(.system(size: 44))
                             .foregroundStyle(.blue)
                         Text("Hi, I'm Nick 👋").font(.title3.bold())
-                        Text("I'm a small, independent developer and a daily Citi Bike rider. I kept wishing I could see open docks at a glance — before I got to a full station — so I built this.")
+                        Text("I'm a small developer and have become a Citi Bike addict over the last few years. One feature I've wanted is to have a widget on your home screen for parking, so I don't have to open the app while biking, so I built this! I hope you all enjoy it as much as I do.")
                             .foregroundStyle(.secondary)
                     }
                     .padding(.vertical, 4)

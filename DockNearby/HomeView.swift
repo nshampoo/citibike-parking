@@ -7,12 +7,25 @@ struct HomeView: View {
     @Environment(LocationModel.self) private var location
     @Environment(FavoritesStore.self) private var favorites
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.colorScheme) private var colorScheme
     @AppStorage("onlyWithRoom") private var onlyWithRoom = false
 
     @State private var model = HomeModel()
 
     /// SwiftUI maps slow down with thousands of annotations, so draw at most this many.
     private static let maxPins = 150
+    /// Covers the whole Citi Bike area with room to spare, so the wash has no visible edge.
+    private static let washArea = [
+        CLLocationCoordinate2D(latitude: 38, longitude: -77), CLLocationCoordinate2D(latitude: 38, longitude: -71),
+        CLLocationCoordinate2D(latitude: 43, longitude: -71), CLLocationCoordinate2D(latitude: 43, longitude: -77),
+    ]
+
+    private var mapWash: Color {
+        colorScheme == .dark
+            ? Color(red: 0.11, green: 0.12, blue: 0.14).opacity(0.55)
+            : Color.white.opacity(0.2)
+    }
+
     /// Zoomed out past ~3 km of latitude, pins drop their numbers and become dots.
     private static let numbersBelowSpan = 0.03
 
@@ -36,6 +49,11 @@ struct HomeView: View {
 
     private var map: some View {
         Map(position: $model.camera) {
+            // A translucent graphite wash over the tiles (under labels and pins) pulls the
+            // map's navy/teal/purple toward neutral grey so it matches the app's palette.
+            MapPolygon(coordinates: Self.washArea)
+                .foregroundStyle(mapWash)
+                .mapOverlayLevel(level: .aboveRoads)
             UserAnnotation()
             if let destination = model.destination {
                 Marker(destination.name, systemImage: "mappin", coordinate: destination.coordinate)
