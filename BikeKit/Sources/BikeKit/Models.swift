@@ -67,3 +67,21 @@ public struct NearbyStation: Identifiable, Hashable, Sendable {
         here.distance(from: CLLocation(latitude: latitude, longitude: longitude))
     }
 }
+
+/// A saved place ("Work", "Home") whose nearby docks you want to see before you get there.
+public struct Destination: Codable, Identifiable, Hashable, Sendable {
+    public let id: UUID
+    public var name: String
+    public let latitude: Double
+    public let longitude: Double
+
+    public init(id: UUID = UUID(), name: String, latitude: Double, longitude: Double) {
+        self.id = id
+        self.name = name
+        self.latitude = latitude
+        self.longitude = longitude
+    }
+
+    public var location: CLLocation { CLLocation(latitude: latitude, longitude: longitude) }
+    public var coordinate: CLLocationCoordinate2D { location.coordinate }
+}

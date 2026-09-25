@@ -95,6 +95,13 @@ private func status(_ id: String, bikes: Int = 5, ebikes: Int? = 2, docks: Int =
     #expect(decoded.first?.stationId == "a")
 }
 
+@Test func destinationsRoundTrip() throws {
+    let work = Destination(name: "Work", latitude: 40.75, longitude: -73.99)
+    let decoded = try JSONDecoder().decode([Destination].self, from: JSONEncoder().encode([work]))
+    #expect(decoded == [work])
+    #expect(decoded[0].location.coordinate.latitude == 40.75)
+}
+
 /// Hits the real Citi Bike feed. Run with: LIVE_GBFS=1 swift test
 @Test(.enabled(if: ProcessInfo.processInfo.environment["LIVE_GBFS"] != nil))
 func liveFeedReturnsNearbyStations() async throws {

@@ -18,11 +18,21 @@ public enum AppGroup {
 public enum SharedStore {
     private static let favoritesKey = "favorites"
     private static let lastLocationKey = "lastLoc"
+    private static let destinationsKey = "destinations"
 
     /// Favorite station IDs, starred in the app and read by the widget.
     public static var favorites: Set<String> {
         get { Set(AppGroup.defaults.stringArray(forKey: favoritesKey) ?? []) }
         set { AppGroup.defaults.set(newValue.sorted(), forKey: favoritesKey) }
+    }
+
+    /// Saved destinations, managed in the app and picked in widget settings / Siri.
+    public static var destinations: [Destination] {
+        get {
+            guard let data = AppGroup.defaults.data(forKey: destinationsKey) else { return [] }
+            return (try? JSONDecoder().decode([Destination].self, from: data)) ?? []
+        }
+        set { AppGroup.defaults.set(try? JSONEncoder().encode(newValue), forKey: destinationsKey) }
     }
 
     /// Last known user location, used when the widget can't get a fresh fix.
