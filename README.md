@@ -2,26 +2,25 @@
 
 (Code name **DockNearby** — targets, bundle IDs, and the repo keep that name.)
 
-A SwiftUI app + widgets (home screen and Lock Screen) that show open Citi Bike docks —
-or bikes — near you, near a destination, or at your favorite stations.
+A SwiftUI app + widgets that show open Citi Bike docks — or bikes — near you, near a place
+you're heading, or at your favorite stations.
 
+- **App**: a full-screen map (pins show open docks, or bikes) under a draggable sheet with
+  search, two chip rows, and the nearby list. Tap a pin or row for live counts, Favorite, and
+  cycling directions.
+  - Row 1: **Park | Ride** flips everything between open docks and available bikes
+    (*E-bikes* / *Classic* narrow it in Ride); the hide-empty chip hides stations with none.
+  - Row 2: **Home**, **Work**, and other saved places. Tap one to see stations there.
+  - Asks for location on first launch (which also unlocks location for the widgets). Outside
+    Citi Bike's service area it shows New York instead of empty distances.
+- **Widgets** — home screen (small / medium / large) and Lock Screen (rectangular / circular /
+  inline). Each can show *Closest to me*, *My favorites*, *Near a destination*, or *Commute*
+  (near Work 4am–noon, Home otherwise, once both are set), and **Count** parking, any bike,
+  e-bikes, or classic bikes. Larger sizes have a ↻ refresh button (an interactive `AppIntent`;
+  on the Lock Screen it runs once the phone is unlocked). Rectangular shows up to three dots —
+  the count inside, short street name below ("W 72 St & Amsterdam Ave" → "72nd").
 - **Station widget** (small / medium): the full rundown of one station — parking, classic
   bikes, e-bikes — defaulting to your nearest favorite.
-- **Widgets** — home screen (small / medium / large) and Lock Screen (rectangular / circular /
-  inline), with a ↻ refresh button on the larger ones. Each can show *Closest to me*,
-  *My favorites*, *Near a destination*, or *Commute* — near Work 4am–noon, Home otherwise,
-  once both are set (long-press → Customize → tap the widget).
-  Each widget also picks what to **Count**: open docks, any bike, e-bikes, or classic bikes.
-  Rectangular shows up to three dots — the count inside, short street name below
-  ("W 72 St & Amsterdam Ave" → "72nd") — under a "↻ 5 min ago" row: tap it to refresh
-  (an interactive `AppIntent` button; runs once the phone is unlocked).
-- **App**: asks for location on first launch (which also unlocks location for the widget).
-  The main screen is a full-screen map (pins show open docks) under a draggable sheet
-  with search, chips, and the nearby list; tap a pin or row for live counts, a favorite
-  button, and cycling directions. A **Park | Ride** switch flips everything between open docks
-  and available bikes (with *E-bikes* / *Classic* chips in Ride); the hide-empty chip hides
-  stations with none. Home, Work,
-  and other saved places appear as chips and show docks near there — in the app and as a widget mode.
 - **Siri / Shortcuts**: "How many docks at *station* in Park It",
   "Docks near *destination* in Park It".
 
@@ -36,6 +35,8 @@ Data: Citi Bike's public [GBFS 1.1 feed](https://gbfs.lyft.com/gbfs/1.1/bkn/gbfs
 | `DockNearby/` | iOS app: onboarding, map (`HomeView`) + draggable sheet (`StationsSheet`), shared `HomeModel` |
 | `DockWidget/` | Widget extension (`ParkItWidgets` bundle): the main widget, the Station widget, intents, `LocationFetcher` |
 | `Shared/` | Source compiled into both app and widget (`DestinationEntity`, `StationEntity`, colors) |
+| `Design/` | App icon generator (`make-icon.swift`), App Store listing copy |
+| `docs/` | Support page and privacy policy (served by GitHub Pages) |
 
 The `.xcodeproj`, Info.plists and entitlements are **generated** and gitignored.
 Change `project.yml`, not Xcode's project settings UI.
@@ -58,20 +59,23 @@ open DockNearby.xcodeproj
    the project and wipes anything set there.
 2. `xcodegen generate`, open the project, pick your phone, Run.
    Automatic signing registers the App IDs and App Group for you.
-3. Allow location, star a few stations, then add the widget to your Lock Screen.
+3. Allow location, star a few stations, then add widgets to your Home Screen or Lock Screen.
 
 ## Commands
 
 ```sh
-# Build for the simulator
-xcodebuild -project DockNearby.xcodeproj -scheme DockNearby \
-  -destination 'platform=iOS Simulator,name=iPhone 17 Pro' build
+xcodegen generate
 
-# BikeKit unit tests (offline)
-cd BikeKit && swift test
+# Simulator build, and a device compile check without signing
+xcodebuild -project DockNearby.xcodeproj -scheme DockNearby -destination 'generic/platform=iOS Simulator' build
+xcodebuild -project DockNearby.xcodeproj -scheme DockNearby -destination 'generic/platform=iOS' CODE_SIGNING_ALLOWED=NO build
 
-# Include a test against the live Citi Bike feed
-cd BikeKit && LIVE_GBFS=1 swift test
+# BikeKit unit tests (scratch path outside iCloud); LIVE_GBFS=1 adds a test against the real feed
+cd BikeKit && swift test --scratch-path ~/Library/Caches/BikeKit-build
+cd BikeKit && LIVE_GBFS=1 swift test --scratch-path ~/Library/Caches/BikeKit-build
+
+# Regenerate the app icon
+swift Design/make-icon.swift
 ```
 
 ## Gotchas
@@ -84,6 +88,6 @@ cd BikeKit && LIVE_GBFS=1 swift test
   location the app saw, then to 71st & Amsterdam.
 - Widget extensions have a ~30 MB memory limit; BikeKit caches only the station fields it uses.
 
-## Ideas
+## Roadmap
 
-Ride Live Activity
+Release checklist, device test list, and backlog live in [TODO.md](TODO.md).

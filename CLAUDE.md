@@ -7,6 +7,7 @@ SwiftUI iOS 17+ app + WidgetKit extension showing open Citi Bike docks nearby. S
 - Swift 6 language mode, zero warnings. Keep it that way (check both simulator and device builds).
 - App Group ID lives only in the `APP_GROUP_ID` build setting; code reads it via `AppGroup.id` (Info.plist `AppGroupID`). App ↔ widget shared keys go through `SharedStore` in BikeKit.
 - Put testable logic in BikeKit as pure functions (see `GBFSClient.merge`) and cover it with Swift Testing.
+- Code both the app and the widget need that depends on SwiftUI or AppIntents (entities, colors) goes in `Shared/`, which `project.yml` compiles into both targets. Pure logic still goes in BikeKit.
 
 ## Commands
 ```sh
