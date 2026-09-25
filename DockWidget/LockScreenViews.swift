@@ -52,7 +52,11 @@ struct RectangularView: View {
             Spacer(minLength: 0)
             Button(intent: RefreshIntent()) {
                 HStack(spacing: 4) {
-                    DataAge(date: entry.date).font(.caption2)
+                    // Live dates reserve room for their longest value ("59 minutes ago");
+                    // trailing alignment keeps "now" snug against the arrow.
+                    DataAge(date: entry.date)
+                        .font(.caption2)
+                        .multilineTextAlignment(.trailing)
                     Image(systemName: "arrow.clockwise").font(.system(size: 15))
                 }
                 .foregroundStyle(.secondary)
