@@ -8,7 +8,8 @@ struct HomeView: View {
     @Environment(FavoritesStore.self) private var favorites
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.colorScheme) private var colorScheme
-    @AppStorage("onlyWithRoom") private var onlyWithRoom = false
+    @AppStorage("need") private var need = Need.dock
+    @AppStorage("hideEmpty") private var hideEmpty = false
 
     @State private var model = HomeModel()
     #if DEBUG
@@ -74,8 +75,8 @@ struct HomeView: View {
                 Annotation(s.name, coordinate: s.coordinate) {
                     // A real Button (not onTapGesture) so VoiceOver can read and activate pins.
                     Button { model.select(s, moveMap: false) } label: {
-                        StationPin(docks: s.docks, isFavorite: favorites.contains(s.id),
-                                   isSelected: s.id == model.selectedID, isDimmed: onlyWithRoom && !s.has(.dock),
+                        StationPin(count: s.count(of: need), isFavorite: favorites.contains(s.id),
+                                   isSelected: s.id == model.selectedID, isDimmed: hideEmpty && !s.has(need),
                                    isCompact: compact && s.id != model.selectedID)
                     }
                     .buttonStyle(.plain)
@@ -107,8 +108,9 @@ struct HomeView: View {
     }
 
     private func pinLabel(_ s: NearbyStation) -> String {
-        let docks = s.docks == 1 ? "1 open dock" : "\(s.docks) open docks"
-        return [s.name, docks, favorites.contains(s.id) ? "favorite" : nil].compactMap { $0 }.joined(separator: ", ")
+        let n = s.count(of: need)
+        let count = need == .dock ? "\(n) open \(need.noun(for: n))" : "\(n) \(need.noun(for: n))"
+        return [s.name, count, favorites.contains(s.id) ? "favorite" : nil].compactMap { $0 }.joined(separator: ", ")
     }
 
     /// Stations inside the visible region; if there are too many, the ones nearest its center.

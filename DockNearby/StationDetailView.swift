@@ -7,6 +7,8 @@ import BikeKit
 struct StationDetailView: View {
     let station: NearbyStation
     let here: CLLocation?
+    /// What you're looking for; the matching counts get the availability color.
+    let need: Need
     let onClose: () -> Void
     @Environment(FavoritesStore.self) private var favorites
 
@@ -34,9 +36,9 @@ struct StationDetailView: View {
             }
 
             HStack {
-                stat(station.docks, "docks", color: dockColor(station.docks))
-                stat(station.classic, "bikes")
-                stat(station.ebikes, "e-bikes")
+                stat(station.docks, "docks", highlighted: need == .dock)
+                stat(station.classic, "classic", highlighted: need == .classicBike || need == .anyBike)
+                stat(station.ebikes, "e-bikes", highlighted: need == .eBike || need == .anyBike)
             }
 
             if !station.renting {
@@ -77,9 +79,10 @@ struct StationDetailView: View {
         item.openInMaps(launchOptions: [MKLaunchOptionsDirectionsModeKey: MKLaunchOptionsDirectionsModeCycling])
     }
 
-    private func stat(_ value: Int, _ label: String, color: Color = .primary) -> some View {
+    private func stat(_ value: Int, _ label: String, highlighted: Bool) -> some View {
         VStack {
-            Text("\(value)").font(.title.bold()).foregroundStyle(color)
+            Text("\(value)").font(.title.bold())
+                .foregroundStyle(highlighted ? availabilityColor(value) : .primary)
             Text(label).font(.caption).foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity)

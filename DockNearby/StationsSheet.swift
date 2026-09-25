@@ -10,7 +10,9 @@ struct StationsSheet: View {
     @Environment(FavoritesStore.self) private var favorites
     @Environment(DestinationsStore.self) private var destinations
     @Environment(\.openURL) private var openURL
-    @AppStorage("onlyWithRoom") private var onlyWithRoom = false
+    /// Park (docks) or Ride (bikes, optionally only e-bikes or classics). Per device.
+    @AppStorage("need") private var need = Need.dock
+    @AppStorage("hideEmpty") private var hideEmpty = false
 
     @FocusState private var searchFocused: Bool
     /// Which kind of place the add screen is open for, if any.
@@ -22,7 +24,9 @@ struct StationsSheet: View {
     var body: some View {
         Group {
             if let station = model.selected {
-                StationDetailView(station: station, here: model.usable(location.location)) { model.selectedID = nil }
+                StationDetailView(station: station, here: model.usable(location.location), need: need) {
+                    model.selectedID = nil
+                }
             } else {
                 VStack(spacing: 12) {
                     searchField.padding(.horizontal)
@@ -63,13 +67,30 @@ struct StationsSheet: View {
         .background(.fill.tertiary, in: .capsule)
     }
 
-    /// "Open docks" filter, Home and Work, other saved places, then +.
-    /// Tap a place to see docks there; long-press to change or delete it.
+    /// Park | Ride, the hide-empty filter (plus e-bike/classic in Ride), Home and Work,
+    /// other saved places, then +. Tap a place to see stations there; long-press to change it.
     private var chips: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
-                Chip(title: "Open docks", systemImage: "parkingsign.circle", isOn: onlyWithRoom) {
-                    onlyWithRoom.toggle()
+                Picker("Looking for", selection: rideMode) {
+                    Text("Park").tag(false)
+                    Text("Ride").tag(true)
+                }
+                .pickerStyle(.segmented)
+                .fixedSize()
+
+                Chip(title: need.isBike ? "Has bikes" : "Open docks",
+                     systemImage: need.isBike ? "bicycle.circle" : "parkingsign.circle", isOn: hideEmpty) {
+                    hideEmpty.toggle()
+                }
+                if need.isBike {
+                    // Mutually exclusive: tap one to narrow to that kind, tap again for any bike.
+                    Chip(title: "E-bikes", systemImage: "bolt.fill", isOn: need == .eBike) {
+                        need = need == .eBike ? .anyBike : .eBike
+                    }
+                    Chip(title: "Classic", systemImage: "bicycle", isOn: need == .classicBike) {
+                        need = need == .classicBike ? .anyBike : .classicBike
+                    }
                 }
                 fixedPlaceChip(.home, destinations.home)
                 fixedPlaceChip(.work, destinations.work)
@@ -81,6 +102,10 @@ struct StationsSheet: View {
             }
             .padding(.horizontal)
         }
+    }
+
+    private var rideMode: Binding<Bool> {
+        Binding(get: { need.isBike }, set: { need = $0 ? .anyBike : .dock })
     }
 
     /// Home or Work: "Set Home" until it's saved, then a normal place chip.
@@ -123,7 +148,7 @@ struct StationsSheet: View {
         let matches = model.query.isEmpty ? sorted : sorted.filter { $0.name.localizedStandardContains(model.query) }
         let favs = matches.filter { favorites.contains($0.id) }
         // Favorites always show; the room filter only trims the rest.
-        let others = matches.filter { !favorites.contains($0.id) && (!onlyWithRoom || $0.has(.dock)) }
+        let others = matches.filter { !favorites.contains($0.id) && (!hideEmpty || $0.has(need)) }
 
         return List {
             if model.destination == nil {
@@ -174,8 +199,9 @@ struct StationsSheet: View {
                     }
                 }
                 Spacer()
-                Text("\(s.docks)").font(.headline).foregroundStyle(dockColor(s.docks))
-                Text("docks").font(.caption).foregroundStyle(.secondary)
+                let n = s.count(of: need)
+                Text("\(n)").font(.headline).foregroundStyle(availabilityColor(n))
+                Text(need.noun(for: n)).font(.caption).foregroundStyle(.secondary)
             }
         }
         .tint(.primary)
