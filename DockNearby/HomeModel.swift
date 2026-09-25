@@ -27,6 +27,20 @@ final class HomeModel {
 
     var selected: NearbyStation? { stations.first { $0.id == selectedID } }
 
+    /// The user's location if Citi Bike operates there; nil if unknown or far away
+    /// (say, an App Store reviewer in Cupertino), so we don't show "2,500 mi" everywhere.
+    func usable(_ location: CLLocation?) -> CLLocation? {
+        guard let location, NearbyStation.serviceArea(stations, contains: location) else { return nil }
+        return location
+    }
+
+    /// Outside the service area, stop following the user onto an empty map and show NYC.
+    func keepCameraInServiceArea(user: CLLocation?) {
+        guard let user, usable(user) == nil, camera.followsUserLocation else { return }
+        camera = .region(MKCoordinateRegion(center: SharedStore.fallbackLocation.coordinate,
+                                            latitudinalMeters: 1_500, longitudinalMeters: 1_500))
+    }
+
     func load(near here: CLLocation?) async {
         do {
             stations = try await GBFSClient.shared.stations(near: here ?? SharedStore.fallbackLocation)

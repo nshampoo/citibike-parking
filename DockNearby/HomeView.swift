@@ -41,7 +41,11 @@ struct HomeView: View {
                     .interactiveDismissDisabled()
                     .translucentSheetBackground()
             }
-            .task { await model.load(near: location.location) }
+            .task {
+                await model.load(near: location.location)
+                model.keepCameraInServiceArea(user: location.location)
+            }
+            .onChange(of: location.location) { _, user in model.keepCameraInServiceArea(user: user) }
             .onChange(of: scenePhase) { _, phase in
                 if phase == .active { Task { await model.load(near: location.location) } }
             }

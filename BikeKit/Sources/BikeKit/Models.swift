@@ -65,6 +65,13 @@ public struct NearbyStation: Identifiable, Hashable, Sendable {
     public func distance(from here: CLLocation) -> CLLocationDistance {
         here.distance(from: CLLocation(latitude: latitude, longitude: longitude))
     }
+
+    /// Whether `here` is within `radius` of any station — i.e. somewhere Citi Bike operates.
+    /// Unknown (true) until stations have loaded, so nothing flickers on launch.
+    public static func serviceArea(_ stations: [NearbyStation], contains here: CLLocation,
+                                   radius: CLLocationDistance = 50_000) -> Bool {
+        stations.isEmpty || stations.contains { $0.distance(from: here) <= radius }
+    }
 }
 
 /// A saved place whose nearby docks you want to see before you get there.

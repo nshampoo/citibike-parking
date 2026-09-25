@@ -22,7 +22,7 @@ struct StationsSheet: View {
     var body: some View {
         Group {
             if let station = model.selected {
-                StationDetailView(station: station, here: location.location) { model.selectedID = nil }
+                StationDetailView(station: station, here: model.usable(location.location)) { model.selectedID = nil }
             } else {
                 VStack(spacing: 12) {
                     searchField.padding(.horizontal)
@@ -114,17 +114,28 @@ struct StationsSheet: View {
     // MARK: List
 
     private var list: some View {
-        // Distance from the destination or the user when known; alphabetical otherwise.
-        let here = model.destination?.location ?? location.location
-        let sorted = here.map { h in model.stations.sorted { $0.distance(from: h) < $1.distance(from: h) } }
-            ?? model.stations.sorted { $0.name.localizedStandardCompare($1.name) == .orderedAscending }
+        // Distances from the destination or the user when known. Otherwise (no location, or
+        // outside Citi Bike's area) sort around the default spot the map shows, without distances.
+        let userHere = model.usable(location.location)
+        let here = model.destination?.location ?? userHere
+        let reference = here ?? SharedStore.fallbackLocation
+        let sorted = model.stations.sorted { $0.distance(from: reference) < $1.distance(from: reference) }
         let matches = model.query.isEmpty ? sorted : sorted.filter { $0.name.localizedStandardContains(model.query) }
         let favs = matches.filter { favorites.contains($0.id) }
         // Favorites always show; the room filter only trims the rest.
         let others = matches.filter { !favorites.contains($0.id) && (!onlyWithRoom || $0.hasRoom) }
 
         return List {
-            if model.destination == nil && !location.isAuthorized { permissionBanner }
+            if model.destination == nil {
+                if !location.isAuthorized {
+                    permissionBanner
+                } else if location.location != nil && userHere == nil {
+                    Label("You're outside Citi Bike's service area, so this shows New York.", systemImage: "globe.americas")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .listRowBackground(Color.clear)
+                }
+            }
             if !favs.isEmpty {
                 Section("Favorites") { ForEach(favs) { row($0, here: here) } }
             }

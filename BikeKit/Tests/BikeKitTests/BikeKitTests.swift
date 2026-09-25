@@ -177,3 +177,14 @@ func commuteLegByTime(hour: Int, minute: Int, expected: Commute.Leg) {
     #expect(Commute.nextSwitch(after: at(13), calendar: nyc) == at(4, day: 25))
     #expect(Commute.nextSwitch(after: at(12), calendar: nyc) == at(4, day: 25))   // exactly at a switch → the next one
 }
+
+// MARK: - Service area
+
+@Test func serviceAreaIsWithin50kmOfAStation() {
+    let stations = GBFSClient.merge(info: [info("a", lat: 40.78)], statuses: [status("a")],
+                                    here: here, count: 3, only: nil)
+    #expect(NearbyStation.serviceArea(stations, contains: here))                                     // Upper West Side
+    #expect(NearbyStation.serviceArea(stations, contains: CLLocation(latitude: 40.95, longitude: -73.98)))  // ~19 km north
+    #expect(!NearbyStation.serviceArea(stations, contains: CLLocation(latitude: 37.33, longitude: -122.01))) // Cupertino
+    #expect(NearbyStation.serviceArea([], contains: CLLocation(latitude: 37.33, longitude: -122.01)))        // not loaded yet
+}
