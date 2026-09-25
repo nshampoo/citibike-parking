@@ -11,6 +11,9 @@ struct HomeView: View {
     @AppStorage("onlyWithRoom") private var onlyWithRoom = false
 
     @State private var model = HomeModel()
+    #if DEBUG
+    @Environment(DestinationsStore.self) private var destinations
+    #endif
 
     /// SwiftUI maps slow down with thousands of annotations, so draw at most this many.
     private static let maxPins = 150
@@ -44,6 +47,9 @@ struct HomeView: View {
             .task {
                 await model.load(near: location.location)
                 model.keepCameraInServiceArea(user: location.location)
+                #if DEBUG
+                applyScreenshotArguments()
+                #endif
             }
             .onChange(of: location.location) { _, user in model.keepCameraInServiceArea(user: user) }
             .onChange(of: scenePhase) { _, phase in
@@ -139,3 +145,28 @@ private extension View {
         }
     }
 }
+
+#if DEBUG
+extension HomeView {
+    /// Debug-only launch arguments that stage App Store screenshots without tapping:
+    ///   -screenshotCard    open the first favorite's (or nearest roomy station's) card
+    ///   -screenshotPlaces  save demo Home/Work if missing and show docks near Work
+    private func applyScreenshotArguments() {
+        let args = ProcessInfo.processInfo.arguments
+        if args.contains("-screenshotCard"),
+           let s = model.stations.first(where: { favorites.contains($0.id) })
+               ?? model.stations.first(where: { $0.docks > 5 }) {
+            model.select(s, moveMap: true)
+        }
+        if args.contains("-screenshotPlaces") {
+            if destinations.home == nil {
+                destinations.add(name: "Home", kind: .home, at: .init(latitude: 40.7781, longitude: -73.9820))
+            }
+            if destinations.work == nil {
+                destinations.add(name: "Work", kind: .work, at: .init(latitude: 40.7527, longitude: -73.9772))
+            }
+            if let work = destinations.work { model.show(work) }
+        }
+    }
+}
+#endif
