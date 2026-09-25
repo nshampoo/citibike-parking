@@ -23,3 +23,10 @@ DerivedData/
 *.xcconfig.local
 Secrets.xcconfig
 .env
+
+# XcodeGen output — regenerate with `xcodegen generate` (project.yml is the source of truth)
+*.xcodeproj/
+DockNearby/Info.plist
+DockNearby/DockNearby.entitlements
+DockWidget/Info.plist
+DockWidget/DockWidget.entitlements
