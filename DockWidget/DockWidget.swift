@@ -21,7 +21,15 @@ struct DockWidgetView: View {
     }
 }
 
+/// Everything this extension offers in the widget gallery.
 @main
+struct ParkItWidgets: WidgetBundle {
+    var body: some Widget {
+        DockWidget()
+        StationWidget()
+    }
+}
+
 struct DockWidget: Widget {
     var body: some WidgetConfiguration {
         AppIntentConfiguration(kind: "DockWidget", intent: DockConfig.self, provider: Provider()) {
