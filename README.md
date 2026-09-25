@@ -10,7 +10,7 @@ with classic/e-bike counts and a tap-to-refresh button.
 - **App**: asks for location on first launch (which also unlocks location for the widget).
   The main screen is a map of stations (pins show open docks) above a nearby list;
   tap a pin or row for live counts, a favorite button, and cycling directions.
-  A filter hides stations with fewer than 2 open docks. **Destinations** (Work, Home…)
+  A filter hides full stations. **Destinations** (Work, Home…)
   show docks near a place before you get there — in the app and as a widget mode.
 - **Siri / Shortcuts**: "How many docks at *station* in DockNearby",
   "Docks near *destination* in DockNearby".

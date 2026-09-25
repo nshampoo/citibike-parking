@@ -80,13 +80,13 @@ private func status(_ id: String, bikes: Int = 5, ebikes: Int? = 2, docks: Int =
     #expect(result.map(\.id) == ["a", "c"])
 }
 
-@Test func needsRoomSkipsNearlyFullStations() {
+@Test func needsRoomSkipsFullStations() {
     let result = GBFSClient.merge(
         info: [info("full", lat: 40.7782), info("one", lat: 40.779), info("two", lat: 40.78), info("closed", lat: 40.781)],
         statuses: [status("full", docks: 0), status("one", docks: 1), status("two", docks: 2),
                    status("closed", docks: 9, returning: 0)],
         here: here, count: 3, only: nil, needsRoom: true)
-    #expect(result.map(\.id) == ["two"])
+    #expect(result.map(\.id) == ["one", "two"])
 }
 
 @Test func slimCacheRoundTrips() throws {
