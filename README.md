@@ -19,8 +19,9 @@ you're heading, or at your favorite stations.
   e-bikes, or classic bikes. Larger sizes have a ↻ refresh button (an interactive `AppIntent`;
   on the Lock Screen it runs once the phone is unlocked). Rectangular shows up to three dots —
   the count inside, short street name below ("W 72 St & Amsterdam Ave" → "72nd").
-- **Station widget** (small / medium): the full rundown of one station — parking, classic
-  bikes, e-bikes — defaulting to your nearest favorite.
+- **Station widget** (home screen small / medium, Lock Screen rectangular / circular / inline):
+  the full rundown of one station — parking, classic bikes, e-bikes — defaulting to your
+  nearest favorite.
 - **Siri / Shortcuts**: "How many docks at *station* in Park It",
   "Docks near *destination* in Park It".
 
