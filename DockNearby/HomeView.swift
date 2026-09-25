@@ -62,10 +62,14 @@ struct HomeView: View {
             let compact = (model.visibleRegion?.span.latitudeDelta ?? 0) > Self.numbersBelowSpan
             ForEach(pins) { s in
                 Annotation(s.name, coordinate: s.coordinate) {
-                    StationPin(docks: s.docks, isFavorite: favorites.contains(s.id),
-                               isSelected: s.id == model.selectedID, isDimmed: onlyWithRoom && !s.hasRoom,
-                               isCompact: compact && s.id != model.selectedID)
-                        .onTapGesture { model.select(s, moveMap: false) }
+                    // A real Button (not onTapGesture) so VoiceOver can read and activate pins.
+                    Button { model.select(s, moveMap: false) } label: {
+                        StationPin(docks: s.docks, isFavorite: favorites.contains(s.id),
+                                   isSelected: s.id == model.selectedID, isDimmed: onlyWithRoom && !s.hasRoom,
+                                   isCompact: compact && s.id != model.selectedID)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(pinLabel(s))
                 }
                 .annotationTitles(.hidden)
             }
@@ -90,6 +94,11 @@ struct HomeView: View {
         }
         .glassCircle()
         .accessibilityLabel("About Park It")
+    }
+
+    private func pinLabel(_ s: NearbyStation) -> String {
+        let docks = s.docks == 1 ? "1 open dock" : "\(s.docks) open docks"
+        return [s.name, docks, favorites.contains(s.id) ? "favorite" : nil].compactMap { $0 }.joined(separator: ", ")
     }
 
     /// Stations inside the visible region; if there are too many, the ones nearest its center.
