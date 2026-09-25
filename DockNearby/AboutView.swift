@@ -1,0 +1,63 @@
+import SwiftUI
+
+/// The (i) popup: who made this, what it does, where the data comes from.
+struct AboutView: View {
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        NavigationStack {
+            List {
+                Section {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Image(systemName: "bicycle.circle.fill")
+                            .font(.system(size: 44))
+                            .foregroundStyle(.blue)
+                        Text("Hi, I'm Nick 👋").font(.title3.bold())
+                        Text("I'm a small, independent developer and a daily Citi Bike rider. I kept wishing I could see open docks at a glance — before I got to a full station — so I built this.")
+                            .foregroundStyle(.secondary)
+                    }
+                    .padding(.vertical, 4)
+                }
+
+                Section("What it does") {
+                    feature("map", "Live map", "Every pin shows how many docks are open right now.")
+                    feature("parkingsign.circle", "Open docks", "Hide stations that are full.")
+                    feature("star.fill", "Favorites", "Star the stations you use most; they stay at the top.")
+                    feature("mappin", "Places", "Save Work, Home, or anywhere, and check the docks there before you arrive.")
+                    feature("lock.iphone", "Lock Screen widget", "Docks nearby, at your favorites, or near a place — without unlocking.")
+                    feature("mic.fill", "Siri", "“How many docks at … in DockNearby” or “Docks near Work in DockNearby.”")
+                    feature("bicycle", "Directions", "Hand off to Apple Maps for cycling directions to any station.")
+                }
+
+                Section {
+                    Text("Station data comes from Citi Bike's public feed and refreshes every time you open the app. DockNearby isn't affiliated with Citi Bike or Lyft.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                } footer: {
+                    Text("Version \(Self.version)")
+                }
+            }
+            .navigationTitle("About DockNearby")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() } }
+            }
+        }
+    }
+
+    private func feature(_ systemImage: String, _ title: String, _ detail: String) -> some View {
+        Label {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title).font(.subheadline.weight(.semibold))
+                Text(detail).font(.subheadline).foregroundStyle(.secondary)
+            }
+        } icon: {
+            Image(systemName: systemImage).foregroundStyle(.blue)
+        }
+    }
+
+    private static let version =
+        Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.0"
+}
+
+#Preview { AboutView() }

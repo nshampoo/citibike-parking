@@ -37,6 +37,7 @@ struct StationsSheet: View {
         .sheet(isPresented: $addingDestination) {
             NavigationStack { AddDestinationView() }
         }
+        .sheet(isPresented: $model.showingAbout) { AboutView() }
     }
 
     // MARK: Header

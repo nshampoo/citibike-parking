@@ -23,6 +23,7 @@ final class HomeModel {
     var camera = HomeModel.followUser
     var visibleRegion: MKCoordinateRegion?
     var detent = HomeModel.half
+    var showingAbout = false
 
     var selected: NearbyStation? { stations.first { $0.id == selectedID } }
 

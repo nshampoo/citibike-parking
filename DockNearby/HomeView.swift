@@ -53,6 +53,20 @@ struct HomeView: View {
             MapCompass()
         }
         .onMapCameraChange(frequency: .onEnd) { model.visibleRegion = $0.region }
+        // Top padding lines it up with the system location button on the right.
+        .overlay(alignment: .topLeading) { aboutButton.padding(.leading).padding(.top, 16) }
+    }
+
+    /// Opens the About popup. The sheet presents it, since the map's view controller
+    /// is already busy presenting the sheet.
+    private var aboutButton: some View {
+        Button { model.showingAbout = true } label: {
+            Image(systemName: "info")
+                .font(.body.weight(.semibold))
+                .frame(width: 44, height: 44)
+        }
+        .glassCircle()
+        .accessibilityLabel("About DockNearby")
     }
 
     /// Stations inside the visible region; if there are too many, the ones nearest its center.
@@ -69,6 +83,15 @@ struct HomeView: View {
 }
 
 private extension View {
+    /// A floating round button: Liquid Glass on iOS 26, a material before.
+    @ViewBuilder func glassCircle() -> some View {
+        if #available(iOS 26, *) {
+            buttonStyle(.plain).glassEffect(.regular.interactive(), in: .circle)
+        } else {
+            buttonStyle(.plain).background(.regularMaterial, in: .circle).shadow(radius: 2)
+        }
+    }
+
     /// iOS 26 gives partial-height sheets Liquid Glass on its own; earlier versions get a material.
     @ViewBuilder func translucentSheetBackground() -> some View {
         if #available(iOS 26, *) {
