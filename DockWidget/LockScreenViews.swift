@@ -5,6 +5,11 @@ import BikeKit
 // Lock Screen widgets render in a single tint, so color can't carry meaning —
 // the dock count itself is the headline, labeled with a short street name ("72nd").
 
+/// What the numbers count, as a row label: "PARKING", "BIKES", "E-BIKES"…
+func countLabel(for need: Need) -> String {
+    need == .dock ? "PARKING" : need.noun(for: 2).uppercased()
+}
+
 /// Icon for what's being counted: a parking sign for docks, a bolt for e-bikes, else a bike.
 private func symbol(for need: Need) -> String {
     switch need {
@@ -14,8 +19,8 @@ private func symbol(for need: Need) -> String {
     }
 }
 
-/// Short text for error/empty states, shared by all accessory sizes.
-private func statusText(_ entry: DockEntry) -> String? {
+/// Short text for error/empty states, shared by every widget size.
+func statusText(_ entry: DockEntry) -> String? {
     switch entry.state {
     case .failed: "Couldn't load"
     case .noFavorites: "Star stations in the app"
@@ -59,7 +64,7 @@ struct RectangularView: View {
     private var refreshRow: some View {
         HStack(spacing: 0) {
             // What the dots count: "PARKING", "BIKES", "E-BIKES"…
-            Text(entry.need == .dock ? "PARKING" : entry.need.noun(for: 2).uppercased())
+            Text(countLabel(for: entry.need))
                 .font(.caption2.weight(.semibold))
                 .foregroundStyle(.secondary)
             Spacer(minLength: 0)
@@ -100,7 +105,7 @@ private struct DockDot: View {
 
 /// How old the counts are. iOS 18+ counts up live ("5 min ago") without spending
 /// widget reloads; iOS 17's live relative text is too wordy, so it shows the fetch time.
-private struct DataAge: View {
+struct DataAge: View {
     let date: Date
 
     var body: some View {

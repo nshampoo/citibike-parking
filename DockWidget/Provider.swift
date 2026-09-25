@@ -10,6 +10,8 @@ struct DockEntry: TimelineEntry {
     let state: State
     /// What the numbers count: docks, bikes, e-bikes, or classics.
     var need: Need = .dock
+    /// Which stations these are, for the home screen header: "Nearby", "Near Work"…
+    var title = "Nearby"
 
     static let sample = DockEntry(date: .now, stations: [
         NearbyStation(id: "1", name: "W 70 St & Amsterdam Ave", meters: 100, docks: 7, classic: 4, ebikes: 3, renting: true, capacity: 20,
@@ -18,7 +20,7 @@ struct DockEntry: TimelineEntry {
                       latitude: 40.7797, longitude: -73.9808),
         NearbyStation(id: "3", name: "Columbus Ave & W 72 St", meters: 280, docks: 0, classic: 10, ebikes: 9, renting: true,
                       latitude: 40.7780, longitude: -73.9777),
-    ], state: .loaded)
+    ], state: .loaded, title: "Nearby")
 }
 
 struct Provider: AppIntentTimelineProvider {
@@ -39,13 +41,15 @@ struct Provider: AppIntentTimelineProvider {
 
     private func entry(for config: DockConfig, in context: Context) async -> DockEntry {
         let count = switch context.family {
+        case .systemLarge: 6
         case .accessoryInline: 2        // one line above the clock
         case .accessoryCircular: 1
-        default: 3                      // rectangular: one dot per station
+        default: 3                      // small/medium rows, rectangular dots
         }
         let need = config.counting.need
         let favorites = SharedStore.favorites
         let here: CLLocation
+        var title = "Nearby"
         switch config.mode {
         case .favorites where favorites.isEmpty:
             return DockEntry(date: .now, stations: [], state: .noFavorites, need: need)
@@ -56,21 +60,25 @@ struct Provider: AppIntentTimelineProvider {
                 return DockEntry(date: .now, stations: [], state: .noDestination, need: need)
             }
             here = destination.location
+            title = "Near \(destination.name)"
         case .commute:
             guard let home = SharedStore.home, let work = SharedStore.work else {
                 return DockEntry(date: .now, stations: [], state: .noCommute, need: need)
             }
-            here = Commute.leg(at: .now) == .toWork ? work.location : home.location
+            let place = Commute.leg(at: .now) == .toWork ? work : home
+            here = place.location
+            title = "Near \(place.name)"
         case .closest, .favorites:
             here = await LocationFetcher.current()
+            if config.mode == .favorites { title = "Favorites" }
         }
         do {
             let stations = try await GBFSClient.shared.nearest(
                 to: here, count: count, only: config.mode == .favorites ? favorites : nil,
                 mustHave: config.needsRoom ? need : nil)
-            return DockEntry(date: .now, stations: stations, state: .loaded, need: need)
+            return DockEntry(date: .now, stations: stations, state: .loaded, need: need, title: title)
         } catch {
-            return DockEntry(date: .now, stations: [], state: .failed, need: need)
+            return DockEntry(date: .now, stations: [], state: .failed, need: need, title: title)
         }
     }
 }
