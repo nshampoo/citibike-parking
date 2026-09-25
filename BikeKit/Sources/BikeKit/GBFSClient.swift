@@ -40,6 +40,11 @@ public actor GBFSClient {
                                     needsRoom: needsRoom)
     }
 
+    /// Station ID → name from the daily cache, no live status — cheap enough for Siri/Shortcuts lookups.
+    public func stationNames() async throws -> [String: String] {
+        Dictionary(try await stationInfo().map { ($0.stationId, $0.name) }, uniquingKeysWith: { a, _ in a })
+    }
+
     /// Every installed station with live counts, closest first — for the app's map and list.
     public func stations(near here: CLLocation) async throws -> [NearbyStation] {
         try await nearest(to: here, count: .max)

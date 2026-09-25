@@ -1,6 +1,7 @@
 import Observation
 import CoreLocation
 import WidgetKit
+import AppIntents
 import BikeKit
 
 /// Saved destinations, persisted to the App Group so widget settings and Siri can list them.
@@ -22,5 +23,7 @@ final class DestinationsStore {
     private func save() {
         SharedStore.destinations = all
         WidgetCenter.shared.reloadAllTimelines()
+        // Siri learns spoken phrases from suggestedEntities; refresh them when the list changes.
+        DockNearbyShortcuts.updateAppShortcutParameters()
     }
 }

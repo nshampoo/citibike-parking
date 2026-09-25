@@ -1,5 +1,6 @@
 import Observation
 import WidgetKit
+import AppIntents
 import BikeKit
 
 /// Starred station IDs, persisted to the App Group so the widget can read them.
@@ -14,5 +15,7 @@ final class FavoritesStore {
         if ids.contains(id) { ids.remove(id) } else { ids.insert(id) }
         SharedStore.favorites = ids
         WidgetCenter.shared.reloadAllTimelines()
+        // Siri learns spoken phrases from suggestedEntities; refresh them when the list changes.
+        DockNearbyShortcuts.updateAppShortcutParameters()
     }
 }
