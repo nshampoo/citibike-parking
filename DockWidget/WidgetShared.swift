@@ -33,3 +33,47 @@ struct DataAge: View {
         }
     }
 }
+
+/// "now ↻" — tap to refresh. Put it after a Spacer to right-align it: widget buttons
+/// shrink to their content, so a frame inside the label wouldn't push it over.
+struct RefreshButton: View {
+    let date: Date
+    var showsAge = true
+    /// nil matches the text size.
+    var arrowSize: CGFloat? = nil
+
+    var body: some View {
+        Button(intent: RefreshIntent()) {
+            HStack(spacing: 4) {
+                if showsAge {
+                    // Live dates reserve room for their longest value ("59 minutes ago");
+                    // trailing alignment keeps "now" snug against the arrow.
+                    DataAge(date: date).multilineTextAlignment(.trailing)
+                }
+                Image(systemName: "arrow.clockwise").font(arrowSize.map { .system(size: $0) })
+            }
+            .font(.caption2)
+            .foregroundStyle(.secondary)
+        }
+        .buttonStyle(.plain)
+    }
+}
+
+/// A solid light circle with a count cut out of it. Lock Screen widgets
+/// render in one tint, so "dark text on light" means letting the wallpaper show through.
+struct DockDot: View {
+    let count: Int
+
+    var body: some View {
+        ZStack {
+            Circle()
+            Text("\(count)")
+                .font(.headline.weight(.heavy))
+                .minimumScaleFactor(0.6)
+                .blendMode(.destinationOut)
+        }
+        .compositingGroup()
+        .frame(width: 30, height: 30)
+        .widgetAccentable()
+    }
+}

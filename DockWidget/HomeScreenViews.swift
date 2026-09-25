@@ -38,17 +38,7 @@ struct HomeScreenView: View {
                     .lineLimit(1)
             }
             Spacer(minLength: 0)
-            Button(intent: RefreshIntent()) {
-                HStack(spacing: 3) {
-                    if !isSmall {
-                        DataAge(date: entry.date).multilineTextAlignment(.trailing)
-                    }
-                    Image(systemName: "arrow.clockwise")
-                }
-                .font(.caption2)
-                .foregroundStyle(.secondary)
-            }
-            .buttonStyle(.plain)
+            RefreshButton(date: entry.date, showsAge: !isSmall)
         }
     }
 

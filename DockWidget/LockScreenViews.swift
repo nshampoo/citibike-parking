@@ -43,47 +43,15 @@ struct RectangularView: View {
         }
     }
 
-    /// "now ↻" pinned to the right. The Spacer sits outside the Button: widget buttons
-    /// shrink to their content, so a frame inside the label wouldn't push it over.
+    /// "PARKING" on the left, "now ↻" pinned to the right.
     private var refreshRow: some View {
         HStack(spacing: 0) {
-            // What the dots count: "PARKING", "BIKES", "E-BIKES"…
             Text(countLabel(for: entry.need))
                 .font(.caption2.weight(.semibold))
                 .foregroundStyle(.secondary)
             Spacer(minLength: 0)
-            Button(intent: RefreshIntent()) {
-                HStack(spacing: 4) {
-                    // Live dates reserve room for their longest value ("59 minutes ago");
-                    // trailing alignment keeps "now" snug against the arrow.
-                    DataAge(date: entry.date)
-                        .font(.caption2)
-                        .multilineTextAlignment(.trailing)
-                    Image(systemName: "arrow.clockwise").font(.system(size: 15))
-                }
-                .foregroundStyle(.secondary)
-            }
-            .buttonStyle(.plain)
+            RefreshButton(date: entry.date, arrowSize: 15)
         }
-    }
-}
-
-/// A solid light circle with the dock count cut out of it. Lock Screen widgets
-/// render in one tint, so "dark text on light" means letting the wallpaper show through.
-private struct DockDot: View {
-    let count: Int
-
-    var body: some View {
-        ZStack {
-            Circle()
-            Text("\(count)")
-                .font(.headline.weight(.heavy))
-                .minimumScaleFactor(0.6)
-                .blendMode(.destinationOut)
-        }
-        .compositingGroup()
-        .frame(width: 30, height: 30)
-        .widgetAccentable()
     }
 }
 
