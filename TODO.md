@@ -19,7 +19,7 @@ Listing copy lives in [Design/app-store-listing.md](Design/app-store-listing.md)
   - [ ] Paste the subtitle, promo text, keywords and description from the listing doc
   - [ ] Categories: Navigation / Travel · Age rating 4+ · App Privacy: **Data Not Collected**
   - [ ] Paste the App Review notes (the out-of-NYC explanation) from the listing doc
-- [ ] **Take a Lock Screen screenshot on your phone** with the rectangular widget showing (side button + volume up). Needed for slide 3.
+- [ ] **Take two screenshots on your phone** (side button + volume up): your Home Screen with Park It widgets, and your Lock Screen with the rectangular widget. Needed for slides 3 and 4.
 
 ## 📱 Test on your phone (TestFlight, or run from Xcode)
 
