@@ -31,5 +31,7 @@ DockNearby/DockNearby.entitlements
 DockWidget/Info.plist
 DockWidget/DockWidget.entitlements
 
-# Personal phone screenshots used by the App Store screenshot generator (wallpaper, carrier, badges)
+# Personal phone screenshots used by the App Store screenshot generator (wallpaper, carrier, badges),
+# and the generated slides that include them — regenerate with `swift Design/make-screenshots.swift`
 Design/screenshots/device/
+Design/screenshots/appstore/

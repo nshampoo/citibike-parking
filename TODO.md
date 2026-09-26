@@ -19,7 +19,8 @@ Listing copy lives in [Design/app-store-listing.md](Design/app-store-listing.md)
   - [ ] Paste the subtitle, promo text, keywords and description from the listing doc
   - [ ] Categories: Navigation / Travel · Age rating 4+ · App Privacy: **Data Not Collected**
   - [ ] Paste the App Review notes (the out-of-NYC explanation) from the listing doc
-- [ ] **Take two screenshots on your phone** (side button + volume up): your Home Screen with Park It widgets, and your Lock Screen with the rectangular widget. Needed for slides 3 and 4.
+- [x] **Take two screenshots on your phone**: Home Screen widgets and Lock Screen widgets (saved in `Design/screenshots/device/`, gitignored)
+  - [ ] Optional: retake the Home Screen one after rebuilding. Slide 3 still shows the old "600 ft · … 1 minute ago" gap in the Station widget.
 
 ## 📱 Test on your phone (TestFlight, or run from Xcode)
 
@@ -46,9 +47,10 @@ These have compiled cleanly but have never been used on a real device:
 
 ## 🎨 Screenshots — Claude's steps
 
-- [ ] **Re-take the raw screenshots** on the iPhone 17 Pro Max simulator (1320 × 2868). Warm up the map first; the first attempt came out blank.
-  Debug-only launch options stage the scenes: `-screenshotCard`, `-screenshotPlaces`.
-- [ ] **Build the "story" screenshot generator**: a script, like `Design/make-icon.swift`, that puts each shot in a tilted phone outline on a graphite → blue background with a big caption. Output is ready to upload.
+- [x] **Raw screenshots** on the iPhone 17 Pro Max simulator (1320 × 2868) → `Design/screenshots/raw/`.
+  Warm the map ~30 s first; stage scenes with the saved `filters` default and `-screenshotPlaces`.
+- [x] **Story generator**: `swift Design/make-screenshots.swift` → `Design/screenshots/appstore/1…6.png`
+  (opaque PNGs, upload in order). Captions and tilts are at the top of the script.
 - [ ] Story draft (edit the captions!):
   1. "Never ride up to a full dock." — live map
   2. "Park or ride." — Ride mode with E-bikes on
