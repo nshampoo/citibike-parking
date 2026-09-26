@@ -10,9 +10,9 @@ struct StationsSheet: View {
     @Environment(FavoritesStore.self) private var favorites
     @Environment(DestinationsStore.self) private var destinations
     @Environment(\.openURL) private var openURL
-    /// Park (docks) or Ride (bikes, optionally only e-bikes or classics). Per device.
-    @AppStorage("need") private var need = Need.dock
-    @AppStorage("hideEmpty") private var hideEmpty = false
+    /// Park | Ride and each mode's own filters, remembered per device.
+    @AppStorage("filters") private var filters = Filters()
+    private var need: Need { filters.need }
 
     @FocusState private var searchFocused: Bool
     /// Which kind of place the add screen is open for, if any.
@@ -74,7 +74,7 @@ struct StationsSheet: View {
     /// the e-bike / classic narrowing (mutually exclusive; tap again for any bike).
     private var filterChips: some View {
         chipRow {
-            Picker("Looking for", selection: rideMode) {
+            Picker("Looking for", selection: $filters.isRiding) {
                 Text("Park").tag(false)
                 Text("Ride").tag(true)
             }
@@ -82,15 +82,15 @@ struct StationsSheet: View {
             .fixedSize()
 
             Chip(title: need.isBike ? "Has bikes" : "Open docks",
-                 systemImage: need.isBike ? "bicycle.circle" : "parkingsign.circle", isOn: hideEmpty) {
-                hideEmpty.toggle()
+                 systemImage: need.isBike ? "bicycle.circle" : "parkingsign.circle", isOn: filters.hideEmpty) {
+                filters.hideEmpty.toggle()
             }
             if need.isBike {
                 Chip(title: "E-bikes", systemImage: "bolt.fill", isOn: need == .eBike) {
-                    need = need == .eBike ? .anyBike : .eBike
+                    filters.toggleBikeKind(.eBike)
                 }
                 Chip(title: "Classic", systemImage: "bicycle", isOn: need == .classicBike) {
-                    need = need == .classicBike ? .anyBike : .classicBike
+                    filters.toggleBikeKind(.classicBike)
                 }
             }
         }
@@ -114,10 +114,6 @@ struct StationsSheet: View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8, content: content).padding(.horizontal)
         }
-    }
-
-    private var rideMode: Binding<Bool> {
-        Binding(get: { need.isBike }, set: { need = $0 ? .anyBike : .dock })
     }
 
     /// Home or Work: "Set Home" until it's saved, then a normal place chip.
@@ -160,7 +156,7 @@ struct StationsSheet: View {
         let matches = model.query.isEmpty ? sorted : sorted.filter { $0.name.localizedStandardContains(model.query) }
         let favs = matches.filter { favorites.contains($0.id) }
         // Favorites always show; the hide-empty filter only trims the rest.
-        let others = matches.filter { !favorites.contains($0.id) && (!hideEmpty || $0.has(need)) }
+        let others = matches.filter { !favorites.contains($0.id) && (!filters.hideEmpty || $0.has(need)) }
 
         return List {
             if model.destination == nil {

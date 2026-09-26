@@ -8,8 +8,8 @@ struct HomeView: View {
     @Environment(FavoritesStore.self) private var favorites
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.colorScheme) private var colorScheme
-    @AppStorage("need") private var need = Need.dock
-    @AppStorage("hideEmpty") private var hideEmpty = false
+    @AppStorage("filters") private var filters = Filters()
+    private var need: Need { filters.need }
 
     @State private var model = HomeModel()
     #if DEBUG
@@ -76,7 +76,7 @@ struct HomeView: View {
                     // A real Button (not onTapGesture) so VoiceOver can read and activate pins.
                     Button { model.select(s, moveMap: false) } label: {
                         StationPin(count: s.count(of: need), isFavorite: favorites.contains(s.id),
-                                   isSelected: s.id == model.selectedID, isDimmed: hideEmpty && !s.has(need),
+                                   isSelected: s.id == model.selectedID, isDimmed: filters.hideEmpty && !s.has(need),
                                    isCompact: compact && s.id != model.selectedID)
                     }
                     .buttonStyle(.plain)

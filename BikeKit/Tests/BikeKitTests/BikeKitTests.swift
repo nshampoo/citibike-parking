@@ -224,3 +224,43 @@ private func station(docks: Int = 4, classic: Int = 3, ebikes: Int = 2, renting:
     #expect(Need.eBike.noun(for: 3) == "e-bikes")
     #expect(Need.anyBike.noun(for: 0) == "bikes")
 }
+
+// MARK: - Filters (per-mode memory)
+
+@Test func switchingModesKeepsEachModesFilters() {
+    var f = Filters()
+    f.hideEmpty = true                 // Park: hide full
+    f.isRiding = true
+    #expect(f.need == .anyBike)
+    #expect(!f.hideEmpty)              // Ride starts with its own setting
+    f.toggleBikeKind(.eBike)
+    f.hideEmpty = true
+    f.isRiding = false
+    #expect(f.need == .dock)
+    #expect(f.hideEmpty)               // Park's setting came back
+    f.isRiding = true
+    #expect(f.need == .eBike)          // and Ride's e-bike choice did too
+    #expect(f.hideEmpty)
+}
+
+@Test func bikeKindTogglesBackToAny() {
+    var f = Filters()
+    f.isRiding = true
+    f.toggleBikeKind(.classicBike)
+    #expect(f.need == .classicBike)
+    f.toggleBikeKind(.eBike)
+    #expect(f.need == .eBike)          // switching kinds replaces, never both
+    f.toggleBikeKind(.eBike)
+    #expect(f.need == .anyBike)
+    f.toggleBikeKind(.dock)            // not a bike kind: ignored
+    #expect(f.need == .anyBike)
+}
+
+@Test func filtersSurviveBeingSaved() {
+    var f = Filters()
+    f.isRiding = true
+    f.toggleBikeKind(.eBike)
+    f.hideFullParking = true
+    #expect(Filters(rawValue: f.rawValue) == f)
+    #expect(Filters(rawValue: "not json") == nil)
+}
