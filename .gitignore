@@ -30,3 +30,6 @@ DockNearby/Info.plist
 DockNearby/DockNearby.entitlements
 DockWidget/Info.plist
 DockWidget/DockWidget.entitlements
+
+# Personal phone screenshots used by the App Store screenshot generator (wallpaper, carrier, badges)
+Design/screenshots/device/
