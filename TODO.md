@@ -1,6 +1,6 @@
 # Park It — TODO
 
-Where things stand (Sept 24, 2026): the app is feature-complete for v1 and review-proofed.
+Where things stand (Sept 25, 2026): the app is feature-complete for v1 and review-proofed.
 What's left is App Store setup, device testing, and marketing screenshots.
 Listing copy lives in [Design/app-store-listing.md](Design/app-store-listing.md).
 
@@ -51,10 +51,11 @@ These have compiled cleanly but have never been used on a real device:
 - [ ] **Build the "story" screenshot generator**: a script, like `Design/make-icon.swift`, that puts each shot in a tilted phone outline on a graphite → blue background with a big caption. Output is ready to upload.
 - [ ] Story draft (edit the captions!):
   1. "Never ride up to a full dock." — live map
-  2. "Every station, live." — station card
-  3. "Check without unlocking." — Lock Screen widget *(needs your phone screenshot)*
-  4. "Your commute, handled." — Home/Work chips, docks near Work
-  5. "Easy on the eyes at night." — dark map
+  2. "Park or ride." — Ride mode with E-bikes on
+  3. "Your stations, on your Home Screen." — home screen + Station widgets *(needs your phone screenshot)*
+  4. "Check without unlocking." — Lock Screen widgets *(needs your phone screenshot)*
+  5. "Your commute, handled." — Home/Work chips, docks near Work
+  6. "Easy on the eyes at night." — dark map
 - [ ] After enrollment: update the team ID, then archive → upload to TestFlight together.
 
 ## ✨ Small polish (optional, quick)
@@ -64,6 +65,7 @@ These have compiled cleanly but have never been used on a real device:
 - [ ] Refresh the widget whenever the app opens
 - [ ] Inline Lock Screen widget: prefix "Work:" / "Home:" in Commute mode
 - [ ] Short-name clashes: two favorites on the same street both show "70th". Add the cross street?
+- [ ] Tap a widget row → the app opens straight to that station's card (the official widget can't)
 
 ## 💡 Future ideas (backlog)
 
