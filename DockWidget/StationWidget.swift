@@ -134,24 +134,27 @@ struct StationWidgetView: View {
         }
     }
 
-    /// Name on top (distance, age and ↻ at the right); the three numbers, labeled, across the bottom.
+    /// Name and ↻ on top, "full name · distance" under it; the three numbers, labeled, across the bottom.
     private func medium(_ s: NearbyStation) -> some View {
         VStack(alignment: .leading, spacing: 2) {
             HStack(alignment: .firstTextBaseline, spacing: 4) {
                 if entry.isFavorite { Image(systemName: "star.fill").foregroundStyle(.yellow) }
                 Text(s.shortName).fontWeight(.bold)
                 Spacer(minLength: 4)
-                HStack(spacing: 4) {
-                    Text(Measurement(value: s.meters, unit: UnitLength.meters),
-                         format: .measurement(width: .abbreviated, usage: .road))
-                    Text("·")
-                    RefreshButton(date: entry.date)
-                }
-                .font(.caption2)
-                .foregroundStyle(.secondary)
+                // On its own: live "1 minute ago" text reserves its widest width, which
+                // would strand anything placed before it.
+                RefreshButton(date: entry.date)
             }
             .font(.headline)
-            Text(s.name).font(.caption).foregroundStyle(.secondary).lineLimit(1)
+            HStack(spacing: 4) {
+                Text(s.name).lineLimit(1)
+                Text("·")
+                Text(Measurement(value: s.meters, unit: UnitLength.meters),
+                     format: .measurement(width: .abbreviated, usage: .road))
+                    .fixedSize()
+            }
+            .font(.caption)
+            .foregroundStyle(.secondary)
             if !s.renting { notRenting }
             Spacer(minLength: 0)
             HStack(spacing: 0) {
