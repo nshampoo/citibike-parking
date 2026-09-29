@@ -4,7 +4,7 @@
 //   swift Design/make-screenshots.swift        # from the repo root
 //
 // Inputs:  Design/screenshots/raw/*.png      simulator shots (see TODO.md for how they're taken)
-//          Design/screenshots/device/*.png   phone shots (gitignored: personal wallpaper, badges)
+//          Design/screenshots/device/*.png   phone shots (Home Screen and Lock Screen widgets)
 // Output:  Design/screenshots/appstore/1.png … 6.png, ready to upload in this order.
 //
 // Edit the captions or tilts in `slides` below and re-run.

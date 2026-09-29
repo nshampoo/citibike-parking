@@ -19,7 +19,7 @@ Listing copy lives in [Design/app-store-listing.md](Design/app-store-listing.md)
   - [ ] Paste the subtitle, promo text, keywords and description from the listing doc
   - [ ] Categories: Navigation / Travel · Age rating 4+ · App Privacy: **Data Not Collected**
   - [ ] Paste the App Review notes (the out-of-NYC explanation) from the listing doc
-- [x] **Take two screenshots on your phone**: Home Screen widgets and Lock Screen widgets (saved in `Design/screenshots/device/`, gitignored)
+- [x] **Take two screenshots on your phone**: Home Screen widgets and Lock Screen widgets (saved in `Design/screenshots/device/`)
   - [ ] Optional: retake the Home Screen one after rebuilding. Slide 3 still shows the old "600 ft · … 1 minute ago" gap in the Station widget.
 
 ## 📱 Test on your phone (TestFlight, or run from Xcode)
